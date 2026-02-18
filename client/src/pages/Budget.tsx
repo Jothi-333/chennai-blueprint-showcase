@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calculator, DollarSign, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import { Calculator, DollarSign, TrendingUp, Save, Edit2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
 
-// Estimated costs from the project
-const estimatedCosts = {
+// Default estimated costs from the project
+const defaultEstimatedCosts = {
   "Foundation & Earthwork": 450000,
   "Structural Work (RCC)": 1200000,
   "Brickwork & Masonry": 350000,
@@ -21,19 +22,46 @@ const estimatedCosts = {
   "Miscellaneous": 230000,
 };
 
-const totalEstimated = Object.values(estimatedCosts).reduce((a, b) => a + b, 0);
-
 export default function Budget() {
-  const [actualCosts, setActualCosts] = useState<Record<string, number>>({});
+  // Load saved data from localStorage or use defaults
+  const [estimatedCosts, setEstimatedCosts] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('budgetEstimatedCosts');
+    return saved ? JSON.parse(saved) : defaultEstimatedCosts;
+  });
 
-  const handleCostChange = (category: string, value: string) => {
+  const [actualCosts, setActualCosts] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('budgetActualCosts');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const handleEstimatedCostChange = (category: string, value: string) => {
+    const numValue = parseFloat(value) || 0;
+    setEstimatedCosts(prev => ({
+      ...prev,
+      [category]: numValue
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleActualCostChange = (category: string, value: string) => {
     const numValue = parseFloat(value) || 0;
     setActualCosts(prev => ({
       ...prev,
       [category]: numValue
     }));
+    setHasUnsavedChanges(true);
   };
 
+  const handleSave = () => {
+    localStorage.setItem('budgetEstimatedCosts', JSON.stringify(estimatedCosts));
+    localStorage.setItem('budgetActualCosts', JSON.stringify(actualCosts));
+    setHasUnsavedChanges(false);
+    toast.success("Budget data saved successfully!");
+  };
+
+  const totalEstimated = Object.values(estimatedCosts).reduce((a, b) => a + b, 0);
   const totalActual = Object.values(actualCosts).reduce((a, b) => a + b, 0);
   const variance = totalActual - totalEstimated;
   const variancePercent = totalEstimated > 0 ? ((variance / totalEstimated) * 100).toFixed(2) : "0";
@@ -41,7 +69,7 @@ export default function Budget() {
   // Prepare chart data
   const chartData = Object.keys(estimatedCosts).map(category => ({
     category: category.replace(" & ", " &\n"),
-    estimated: estimatedCosts[category as keyof typeof estimatedCosts],
+    estimated: estimatedCosts[category],
     actual: actualCosts[category] || 0,
   }));
 
@@ -77,43 +105,43 @@ export default function Budget() {
       <section className="py-12">
         <div className="container">
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card>
+            <Card className="border-blue-500/20 bg-blue-500/5">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <DollarSign className="h-6 w-6 text-blue-500" />
+                  <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Estimated Budget</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalEstimated)}</p>
+                    <p className="text-sm text-muted-foreground font-medium">Estimated Budget</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(totalEstimated)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-orange-500/20 bg-orange-500/5">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                    <Calculator className="h-6 w-6 text-green-500" />
+                  <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                    <Calculator className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Actual Spent</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalActual)}</p>
+                    <p className="text-sm text-muted-foreground font-medium">Actual Spent</p>
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{formatCurrency(totalActual)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className={variance >= 0 ? 'border-red-500/20 bg-red-500/5' : 'border-green-500/20 bg-green-500/5'}>
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full ${variance >= 0 ? 'bg-red-500/10' : 'bg-green-500/10'} flex items-center justify-center`}>
-                    <TrendingUp className={`h-6 w-6 ${variance >= 0 ? 'text-red-500' : 'text-green-500'}`} />
+                  <div className={`w-12 h-12 rounded-full ${variance >= 0 ? 'bg-red-500/20' : 'bg-green-500/20'} flex items-center justify-center`}>
+                    <TrendingUp className={`h-6 w-6 ${variance >= 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`} />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Variance</p>
-                    <p className={`text-2xl font-bold ${variance >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <p className="text-sm text-muted-foreground font-medium">Variance</p>
+                    <p className={`text-2xl font-bold ${variance >= 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                       {variance >= 0 ? '+' : ''}{formatCurrency(variance)}
                     </p>
                     <p className="text-xs text-muted-foreground">({variancePercent}%)</p>
@@ -131,32 +159,86 @@ export default function Budget() {
           <div className="max-w-6xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Enter Actual Costs</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Update the actual costs for each category to track your budget
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Edit2 className="h-5 w-5" />
+                      Budget Management
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Update estimated and actual costs for each category to track your budget
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleSave}
+                    className="gap-2"
+                    variant={hasUnsavedChanges ? "default" : "outline"}
+                  >
+                    <Save className="h-4 w-4" />
+                    {hasUnsavedChanges ? "Save Changes" : "Saved"}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-[2fr_1fr_1fr] gap-4 pb-2 border-b font-semibold text-sm">
+                    <div>Category</div>
+                    <div className="text-blue-600 dark:text-blue-400">Estimated Cost</div>
+                    <div className="text-orange-600 dark:text-orange-400">Actual Cost</div>
+                  </div>
+
+                  {/* Table Rows */}
                   {Object.entries(estimatedCosts).map(([category, estimated]) => (
-                    <div key={category} className="space-y-2">
-                      <Label htmlFor={category}>{category}</Label>
-                      <div className="flex gap-2 items-center">
-                        <div className="flex-1">
-                          <Input
-                            id={category}
-                            type="number"
-                            placeholder={`Estimated: ${formatCurrency(estimated)}`}
-                            value={actualCosts[category] || ''}
-                            onChange={(e) => handleCostChange(category, e.target.value)}
-                          />
-                        </div>
-                        <div className="text-sm text-muted-foreground whitespace-nowrap">
-                          Est: {formatCurrency(estimated)}
-                        </div>
+                    <div key={category} className="grid grid-cols-[2fr_1fr_1fr] gap-4 items-center">
+                      <Label htmlFor={`actual-${category}`} className="font-medium">
+                        {category}
+                      </Label>
+
+                      {/* Estimated Cost Input */}
+                      <div className="relative">
+                        <Input
+                          id={`estimated-${category}`}
+                          type="number"
+                          value={estimated}
+                          onChange={(e) => handleEstimatedCostChange(category, e.target.value)}
+                          className="border-blue-500/30 focus:border-blue-500 bg-blue-500/5"
+                          placeholder="0"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                          ₹
+                        </span>
+                      </div>
+
+                      {/* Actual Cost Input */}
+                      <div className="relative">
+                        <Input
+                          id={`actual-${category}`}
+                          type="number"
+                          value={actualCosts[category] || ''}
+                          onChange={(e) => handleActualCostChange(category, e.target.value)}
+                          className="border-orange-500/30 focus:border-orange-500 bg-orange-500/5"
+                          placeholder="0"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                          ₹
+                        </span>
                       </div>
                     </div>
                   ))}
+
+                  {/* Save Button at Bottom */}
+                  <div className="pt-4 border-t flex justify-end">
+                    <Button
+                      onClick={handleSave}
+                      size="lg"
+                      className="gap-2"
+                      variant={hasUnsavedChanges ? "default" : "outline"}
+                    >
+                      <Save className="h-4 w-4" />
+                      {hasUnsavedChanges ? "Save All Changes" : "All Changes Saved"}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -178,18 +260,21 @@ export default function Budget() {
               <CardContent>
                 <div className="h-[500px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                    <BarChart data={chartData} barGap={8}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                       <XAxis
                         dataKey="category"
                         angle={-45}
                         textAnchor="end"
                         height={120}
                         interval={0}
-                        tick={{ fontSize: 12 }}
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
                       />
                       <YAxis
                         tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`}
+                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                        stroke="hsl(var(--border))"
                       />
                       <Tooltip
                         formatter={(value: number) => formatCurrency(value)}
@@ -197,11 +282,26 @@ export default function Budget() {
                           backgroundColor: 'hsl(var(--background))',
                           border: '1px solid hsl(var(--border))',
                           borderRadius: '8px',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                         }}
+                        labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
                       />
-                      <Legend />
-                      <Bar dataKey="estimated" fill="hsl(var(--primary))" name="Estimated" />
-                      <Bar dataKey="actual" fill="hsl(142 76% 36%)" name="Actual" />
+                      <Legend
+                        wrapperStyle={{ paddingTop: '20px' }}
+                        iconType="rect"
+                      />
+                      <Bar
+                        dataKey="estimated"
+                        fill="#3b82f6"
+                        name="Estimated Cost"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="actual"
+                        fill="#f97316"
+                        name="Actual Cost"
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

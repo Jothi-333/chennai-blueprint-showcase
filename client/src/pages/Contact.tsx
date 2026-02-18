@@ -28,11 +28,11 @@ export default function Contact() {
     }));
   };
 
-  // Chennai location coordinates (you can update these to the exact location)
+  // Porur, Chennai location coordinates
   const location = {
-    lat: 13.0827,
-    lng: 80.2707,
-    address: "Chennai, Tamil Nadu, India"
+    lat: 13.0358,
+    lng: 80.1656,
+    address: "Porur, Chennai, Tamil Nadu, India"
   };
 
   return (
@@ -172,14 +172,14 @@ export default function Contact() {
               <CardContent className="p-0 overflow-hidden">
                 <div className="aspect-video w-full">
                   <iframe
-                    src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248849.90089943527!2d${location.lng}!3d${location.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sChennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin`}
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62204.89502485882!2d80.13560!3d13.0358!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5260f6c9f1c6e5%3A0x3e3e3e3e3e3e3e3e!2sPorur%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin&z=14"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Saroja Illam Location"
+                    title="Saroja Illam Location - Porur, Chennai"
                   />
                 </div>
               </CardContent>
