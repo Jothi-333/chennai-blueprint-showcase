@@ -261,30 +261,52 @@ export default function Budget() {
                 <div className="h-[500px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} barGap={8}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="stroke-muted-foreground/20"
+                      />
                       <XAxis
                         dataKey="category"
                         angle={-45}
                         textAnchor="end"
                         height={120}
                         interval={0}
-                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
-                        stroke="hsl(var(--border))"
+                        className="text-muted-foreground"
+                        tick={{
+                          fontSize: 12,
+                          fill: 'currentColor',
+                        }}
+                        stroke="currentColor"
+                        strokeOpacity={0.3}
                       />
                       <YAxis
                         tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`}
-                        tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
-                        stroke="hsl(var(--border))"
+                        className="text-muted-foreground"
+                        tick={{
+                          fontSize: 12,
+                          fill: 'currentColor',
+                        }}
+                        stroke="currentColor"
+                        strokeOpacity={0.3}
                       />
                       <Tooltip
                         formatter={(value: number) => formatCurrency(value)}
                         contentStyle={{
-                          backgroundColor: 'hsl(var(--background))',
-                          border: '1px solid hsl(var(--border))',
+                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
                           borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                          color: '#ffffff',
                         }}
-                        labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
+                        labelStyle={{
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          marginBottom: '4px',
+                        }}
+                        itemStyle={{
+                          color: '#ffffff',
+                        }}
+                        cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
                       />
                       <Legend
                         wrapperStyle={{ paddingTop: '20px' }}

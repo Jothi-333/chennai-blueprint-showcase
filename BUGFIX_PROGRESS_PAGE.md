@@ -58,7 +58,9 @@
 - Blue bars for estimated costs
 - Orange bars for actual costs
 - Better styling with rounded corners
-- Improved tooltip and legend
+- Dark tooltip with white text for better visibility
+- Visible axis labels in both light and dark modes
+- Subtle hover cursor effect
 - Professional grid and axis styling
 
 #### 📱 Better UI/UX
