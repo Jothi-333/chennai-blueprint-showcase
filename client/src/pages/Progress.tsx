@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
+import { Progress as ProgressBar } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, CheckCircle2, Circle, Clock, Plus, TrendingUp } from "lucide-react";
 import { useState } from "react";
@@ -321,7 +321,7 @@ export default function Progress() {
                           </div>
                         </div>
 
-                        <Progress value={task.progress} className="h-2" />
+                        <ProgressBar value={task.progress} className="h-2" />
                       </div>
                     );
                   })}
