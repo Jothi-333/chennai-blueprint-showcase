@@ -70,7 +70,7 @@ export default function Home() {
     {
       title: "Ground Floor",
       subtitle: "Parking & Entrance",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103753086/yCiJjoJgtevQlWKP.png",
+      image: "/images/Groundfloor.png",
       features: ["Building Footprint: 36'x33' (Matches Upper Floors)", "Wide Entrance Gate (12ft) with Clear Car Circulation", "2 Car Parking (9'x18' each) Side-by-Side", "Two-Wheeler Parking (10'x8') - 4 Bikes", "North-Facing Pedestrian Entrance (6' wide) Separate from Cars", "Lift (5'x4') + Staircase (4ft) + Electrical Room (6'x4')"]
     },
     {
@@ -82,13 +82,13 @@ export default function Home() {
     {
       title: "Second Floor",
       subtitle: "2BHK - 1194 sq ft",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103753086/llIZSiOxNBRisnhk.png",
+      image: "/images/Second Floor.png",
       features: ["✓ COMPLETE LAYOUT - Identical to First Floor", "Lift & Staircase to Entrance Foyer (proper access)", "Northeast Pooja Room (east-facing) + Children's Study Area", "Master Bedroom (SW) with Balcony + Walk-in Wardrobe", "Kitchen with Utility Balcony (6'x4') for laundry", "Staircase UP TO TERRACE - Full Vastu & Functional"]
     },
     {
       title: "Terrace Floor",
       subtitle: "Open Space",
-      image: "https://private-us-east-1.manuscdn.com/sessionFile/U2AefyUXrt7IXb0pS6fDA6/sandbox/PVjq2b5rGkXRllYRIvjBg6-img-4_1771342588000_na1fn_dGVycmFjZV9mbG9vcl91bHRyYV9wcm8.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvVTJBZWZ5VVhydDdJWGIwcFM2ZkRBNi9zYW5kYm94L1BWanEyYjVyR2tYUmxsWVJJdmpCZzYtaW1nLTRfMTc3MTM0MjU4ODAwMF9uYTFmbl9kR1Z5Y21GalpWOW1iRzl2Y2w5MWJIUnlZVjl3Y204LnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=aZ2cKslKtagh2fA~byTMo4ENzcJf-KGrrwdgekZ93UU6QPkYsIGazV46AIboI529ZRl0GLu4Ka906GA5WQsnJGiE4s~u-1ACjLZz3aXbd20mQo1BMharGo67cByQDIOl1NVRqyJGXvN-BIw2Tz7U6snt62ejbNFmPk8DFw4vSnSCQMaVBZd3AtARdCVIFd-Q8cPptuGmeQCWE7fbEVxPNXCk9pUKr-pRVTORPuEd-GweQYRIHJBWXOi7Ph82WYji2DHn-nmXpYVYYhMw55UX3o7YSj3dq5O4nMtwZku4X3ZMt0bWRF2utaBj7t2ZzCrFDujJz40J071lVi8MwZ2WzA__",
+      image: "/images/Terrace plan.png",
       features: ["Open Terrace (25'x30')", "Open Kitchen/BBQ Area (10'x8')", "Sit-out Lounge (12'x10') with Pergola", "Washing Machine Area (4'x4')", "1000L Overhead Water Tank", "Solar Panel Mounting Area (15'x10')"]
     }
   ];
