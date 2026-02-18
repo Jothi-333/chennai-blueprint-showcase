@@ -49,13 +49,13 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   // In production, after build:
-  // - server code is in dist/_core/index.js (from server/_core/index.ts)
+  // - server code is in dist/index.js (from esbuild bundling server/_core/index.ts)
   // - client build is in dist/public (from vite build)
-  // So from dist/_core, we need to go up one level (..) then into public
+  // So from dist/index.js, we need to look for public in the same directory
   const distPath =
     process.env.NODE_ENV === "development"
       ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "..", "public");
+      : path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {
     console.error(
