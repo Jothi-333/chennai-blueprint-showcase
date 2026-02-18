@@ -89,6 +89,7 @@ export default function Home() {
       title: "Terrace Floor",
       subtitle: "Open Space",
       image: "/images/Terrace plan.png",
+      photoImage: "/images/Terrace photorealistic Image.jpg",
       features: ["Open Terrace (25'x30')", "Open Kitchen/BBQ Area (10'x8')", "Sit-out Lounge (12'x10') with Pergola", "Washing Machine Area (4'x4')", "1000L Overhead Water Tank", "Solar Panel Mounting Area (15'x10')"]
     }
   ];
@@ -277,38 +278,110 @@ export default function Home() {
           )}
 
           <div className="grid md:grid-cols-2 gap-8">
-            {floorPlans.map((floor, idx) => (
-              <Card key={idx} className="border-border bg-card/50 overflow-hidden hover:shadow-xl transition-all group">
-                <div className="relative aspect-video overflow-hidden bg-muted">
-                  <img 
-                    src={getFloorPlanImage(floor)} 
-                    alt={floor.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-primary rounded font-mono text-sm font-semibold text-primary-foreground">
-                    {floor.subtitle}
+            {floorPlans.map((floor, idx) => {
+              // Special enhanced layout for Terrace Floor with dual images
+              if (floor.title === "Terrace Floor" && floor.photoImage) {
+                return (
+                  <Card key={idx} className="md:col-span-2 border-border bg-card/50 overflow-hidden hover:shadow-xl transition-all group">
+                    <div className="grid md:grid-cols-2 gap-0">
+                      {/* Floor Plan Image */}
+                      <div className="relative aspect-video overflow-hidden bg-muted border-r border-border">
+                        <img
+                          src={getFloorPlanImage(floor)}
+                          alt={`${floor.title} - Floor Plan`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-primary/90 backdrop-blur-sm rounded font-mono text-xs font-semibold text-primary-foreground">
+                          FLOOR PLAN
+                        </div>
+                        <div className="absolute top-4 right-4 px-3 py-1 bg-background/90 backdrop-blur-sm rounded font-mono text-sm font-semibold">
+                          {floor.subtitle}
+                        </div>
+                      </div>
+
+                      {/* Photorealistic Image */}
+                      <div className="relative aspect-video overflow-hidden bg-muted">
+                        <img
+                          src={floor.photoImage}
+                          alt={`${floor.title} - Photorealistic View`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-4 left-4 px-3 py-1.5 bg-primary/90 backdrop-blur-sm rounded font-mono text-xs font-semibold text-primary-foreground">
+                          PHOTOREALISTIC VIEW
+                        </div>
+                      </div>
+                    </div>
+
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-3xl font-display font-bold">{floor.title}</h3>
+                        <div className="flex gap-3">
+                          <Button
+                            variant="outline"
+                            className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                            onClick={() => openViewer(floor)}
+                          >
+                            <Maximize2 className="h-4 w-4 mr-2" />
+                            View Floor Plan
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                            onClick={() => openViewer({ ...floor, image: floor.photoImage })}
+                          >
+                            <Maximize2 className="h-4 w-4 mr-2" />
+                            View Photo
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {floor.features.map((feature, idx) => (
+                          <div key={idx} className="flex items-start gap-3 text-muted-foreground">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              // Standard layout for other floors
+              return (
+                <Card key={idx} className="border-border bg-card/50 overflow-hidden hover:shadow-xl transition-all group">
+                  <div className="relative aspect-video overflow-hidden bg-muted">
+                    <img
+                      src={getFloorPlanImage(floor)}
+                      alt={floor.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-4 right-4 px-3 py-1 bg-primary rounded font-mono text-sm font-semibold text-primary-foreground">
+                      {floor.subtitle}
+                    </div>
                   </div>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-2xl font-display font-bold mb-4">{floor.title}</h3>
-                  <ul className="space-y-2 mb-6">
-                    {floor.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-muted-foreground">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
-                    onClick={() => openViewer(floor)}
-                  >
-                    <Maximize2 className="h-4 w-4 mr-2" />
-                    View in Detail
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <CardContent className="p-6">
+                    <h3 className="text-2xl font-display font-bold mb-4">{floor.title}</h3>
+                    <ul className="space-y-2 mb-6">
+                      {floor.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-muted-foreground">
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                      onClick={() => openViewer(floor)}
+                    >
+                      <Maximize2 className="h-4 w-4 mr-2" />
+                      View in Detail
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
