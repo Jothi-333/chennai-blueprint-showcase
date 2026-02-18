@@ -16,20 +16,23 @@ import {
 } from "lucide-react";
 
 interface FloorPlanViewerProps {
-  image: string;
-  title: string;
-  subtitle: string;
+  floorPlan: {
+    image: string;
+    title: string;
+    subtitle: string;
+  } | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function FloorPlanViewer({ 
-  image, 
-  title, 
-  subtitle, 
-  isOpen, 
-  onClose 
+export default function FloorPlanViewer({
+  floorPlan,
+  isOpen,
+  onClose
 }: FloorPlanViewerProps) {
+  if (!isOpen || !floorPlan) return null;
+
+  const { image, title, subtitle } = floorPlan;
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -113,8 +116,6 @@ export default function FloorPlanViewer({
   const handleTouchEnd = () => {
     setIsDragging(false);
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4">
