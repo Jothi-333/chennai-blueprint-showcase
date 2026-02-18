@@ -57,7 +57,7 @@ Bauhaus Modernism meets Indian Contemporary aesthetic:
 
 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/chennai-blueprint-showcase.git
+git clone https://github.com/Jothi-333/chennai-blueprint-showcase.git
 cd chennai-blueprint-showcase
 ```
 
@@ -107,7 +107,57 @@ chennai-blueprint-showcase/
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm db:push` - Push database schema changes
-- `pnpm db:studio` - Open Drizzle Studio
+- `pnpm check` - Run TypeScript type checking
+- `pnpm test` - Run tests
+
+## 🚂 Deployment to Railway
+
+### Quick Deploy
+
+1. **Push your code to GitHub** (if not already done)
+
+2. **Create a new project on Railway**
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Choose `chennai-blueprint-showcase`
+
+3. **Add a MySQL Database**
+   - In your Railway project, click "+ New"
+   - Select "Database" → "Add MySQL"
+   - Railway will automatically create a `DATABASE_URL` variable
+
+4. **Configure Environment Variables**
+
+   Go to your project's "Variables" tab and add:
+
+   ```bash
+   NODE_ENV=production
+   SESSION_SECRET=<generate-random-32-char-string>
+   ```
+
+   Optional variables (if using AI features):
+   ```bash
+   GEMINI_API_KEY=<your-gemini-api-key>
+   ```
+
+5. **Deploy**
+   - Railway will automatically detect your `railway.json` configuration
+   - Build command: `pnpm install && pnpm build`
+   - Start command: `pnpm start`
+   - Click "Deploy" and wait for deployment to complete
+
+6. **Access Your App**
+   - Railway will provide a public URL (e.g., `your-app.railway.app`)
+   - Your app will be live! 🎉
+
+### Environment Variables Reference
+
+See `.env.example` for all available environment variables.
+
+### Continuous Deployment
+
+Railway automatically deploys when you push to your GitHub repository's main/master branch.
 
 ## 🤝 Contributing
 

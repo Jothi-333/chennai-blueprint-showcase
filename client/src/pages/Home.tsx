@@ -76,7 +76,7 @@ export default function Home() {
     {
       title: "First Floor",
       subtitle: "2BHK - 1194 sq ft",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663103753086/nTmCzWOEePtZaCmt.png",
+      image: "/images/First Floor.jpg",
       features: ["✓ LIFT & STAIRCASE both connect to Entrance Foyer (proper circulation)", "NORTHEAST: East-Facing Pooja Room (4'x4') - Vastu Ideal", "Children's Study Area (5'x4') with desk near Second Bedroom", "Master Bedroom (SW) with Balcony + Walk-in Wardrobe (dual access)", "Kitchen (SE) with Utility Balcony (6'x4') for washing machine", "Clear North arrow + Full Vastu compliance"]
     },
     {
