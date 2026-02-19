@@ -114,30 +114,79 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Memorial Section - Saroja Ammal */}
+      <section className="relative py-16 bg-gradient-to-br from-primary/5 via-background to-background border-b border-border">
+        <div className="container">
+          <div className="max-w-5xl mx-auto">
+            <Card className="border-primary/30 bg-card/50 overflow-hidden">
+              <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
+                {/* Saroja's Photo */}
+                <div className="relative">
+                  <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl" />
+                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl">
+                    <img
+                      src="/images/saroja/Saroja.jpg"
+                      alt="Saroja Ammal"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Memorial Text */}
+                <div className="flex flex-col justify-center">
+                  <div className="inline-block px-4 py-2 bg-primary/10 rounded mb-4 w-fit">
+                    <span className="text-sm font-mono text-primary font-semibold tracking-wide">IN LOVING MEMORY</span>
+                  </div>
+
+                  <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
+                    Saroja Illam
+                  </h2>
+
+                  <p className="text-xl text-primary font-semibold mb-4">
+                    A Memorial Home for Saroja Ammal
+                  </p>
+
+                  <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                    This home is built in loving memory of <span className="text-foreground font-semibold">Saroja Ammal</span>,
+                    a beloved grandmother, mother, and the heart of our family. Though she has passed away and is now in heaven
+                    with her husband Govindaswami, her love, wisdom, and spirit live on through this memorial home in Porur, Chennai.
+                  </p>
+
+                  <p className="text-base text-muted-foreground italic">
+                    "A grandmother's love is forever. Though she watches over us from heaven,
+                    her presence fills every corner of Saroja Illam." 💕
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 bg-gradient-to-br from-background via-background to-primary/5 blueprint-grid overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
-        
+
         <div className="container relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block px-4 py-2 bg-primary/10 rounded mb-6">
                 <span className="text-sm font-mono text-primary font-semibold tracking-wide">ARCHITECTURAL BLUEPRINT</span>
               </div>
-              
+
               <h1 className="text-5xl md:text-7xl font-display font-bold text-foreground mb-6 leading-tight">
-                Modern 2BHK House<br />
-                <span className="text-primary">Chennai</span>
+                Saroja Illam<br />
+                <span className="text-primary">Porur, Chennai</span>
               </h1>
-              
+
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                A comprehensive architectural blueprint for a G+2 residential building featuring modern amenities, 
+                A comprehensive architectural blueprint for a G+2 residential memorial home featuring modern amenities,
                 north-facing entrance, and complete compliance with Chennai building regulations.
               </p>
-              
+
               <div className="flex flex-wrap gap-4">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
                   onClick={() => openViewer(floorPlans[1])}
                 >
@@ -507,10 +556,13 @@ export default function Home() {
       <footer className="py-12 border-t border-border bg-card/30">
         <div className="container text-center">
           <p className="text-sm text-muted-foreground font-mono">
-            Modern 2BHK House - Chennai | Professional Architectural Blueprint
+            Saroja Illam - A Memorial Home in Porur, Chennai | Professional Architectural Blueprint
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            © 2025 All Rights Reserved | Designed for Chennai Climate & Regulations
+            © 2025 All Rights Reserved | Built in loving memory of Saroja Ammal
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 italic">
+            "Her love lives on in every corner of this home" 💕
           </p>
         </div>
       </footer>

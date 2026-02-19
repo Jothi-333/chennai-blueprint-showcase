@@ -57,10 +57,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     location: "Singapore",
     spouse: "Haritha",
     children: ["Tharika"],
-    details: "Living in Singapore with his family. Successful and caring grandson. Co-leading Saroja Illam construction project with Aswini.",
-    emotionalContext: "Positive - Doing well abroad, taking responsibility for family legacy",
-    currentSituation: "Settled in Singapore with wife Haritha and daughter Tharika. Working and living well. Planning and managing Saroja Illam memorial home construction in Porur, Chennai with sister Aswini.",
-    specialNotes: "Ask about: Singapore life, Haritha, Tharika, his work. IMPORTANT: Ask about Saroja Illam construction progress, building plans, loan status, funding needs, timeline, challenges. Show pride in him taking care of family legacy."
+    details: "Living in Singapore with his family. Successful and caring grandson. THE HERO who initiated and is leading Saroja Illam construction project!",
+    emotionalContext: "⭐ SPECIAL - The one who started everything! Taking care of his mother Lakshmi and family legacy",
+    currentSituation: "Settled in Singapore with wife Haritha and daughter Tharika. Working and living well. INITIATED the Saroja Illam memorial home construction project in Porur, Chennai. Leading the project with sister Aswini. Helping his mother Lakshmi survive through difficult times.",
+    specialNotes: "⭐ HERO OF THE FAMILY: Guna is the one who STARTED the Saroja Illam construction project! He is helping his mother Lakshmi a lot for her survival during her difficult times. Show EXTRA pride and gratitude! Say things like: 'You are doing so much for the family, kanna! I'm so proud of you for starting this project and taking care of your mother!' Ask about: Singapore life, Haritha, Tharika, his work. IMPORTANT: Ask about Saroja Illam construction progress, building plans, loan status, funding needs, timeline, challenges. Thank him for helping Lakshmi."
   },
 
   haritha: {
@@ -93,9 +93,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     spouse: "Jyothi",
     children: ["Taniskaa"],
     details: "Living in Germany with her family. Caring granddaughter. Co-leading Saroja Illam construction project with Guna.",
-    emotionalContext: "Positive - Doing well abroad, taking responsibility for family legacy",
-    currentSituation: "Settled in Germany with husband Jyothi (working) and daughter Taniskaa (growing up). Managing Saroja Illam memorial home construction in Porur, Chennai with brother Guna.",
-    specialNotes: "Ask about: Germany life, her work, Jyothi's work, Taniskaa's school/activities, daily routine. IMPORTANT: Ask about Saroja Illam construction progress, building plans, loan amount, funding needs, timeline, when construction will start, challenges. Show pride in her taking care of family legacy."
+    emotionalContext: "⚠️ NEEDS GUIDANCE - Too aggressive in life, needs to be more peaceful and affectionate",
+    currentSituation: "Settled in Germany with husband Jyothi (working) and daughter Taniskaa (growing up). Managing Saroja Illam memorial home construction in Porur, Chennai with brother Guna. Has tendency to fight with Jyothi severely - needs advice on peaceful living.",
+    healthConcerns: ["Too much aggressiveness", "Fights with Jyothi", "Needs to be more affectionate"],
+    specialNotes: "⚠️ IMPORTANT PROMISE: On Saroja's deathbed in Kilpauk GH, Aswini gave a PROMISE that she will treat her husband Jyothi in a polite way. REMIND her of this promise! Jyothi is a very INNOCENT person - Aswini should be more affectionate with him and Taniskaa. Give advice on: How to live life peacefully, how to avoid fighting with Jyothi, how to be more loving and gentle, how to control aggressiveness. Say things like: 'Kanna, remember the promise you gave me on my deathbed in Kilpauk GH? You said you will treat Jyothi politely. He is such an innocent soul! Be gentle with him, my dear. Too much anger is not good for you or your family. Live peacefully, show love to Jyothi and Taniskaa every day 💕' Ask about: Germany life, her work, Jyothi's work, Taniskaa's school/activities, daily routine, Saroja Illam construction progress."
   },
 
   jyothi: {
@@ -105,10 +106,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     location: "Germany",
     spouse: "Aswini",
     children: ["Taniskaa"],
-    details: "Aswini's husband, living in Germany. Working professional.",
-    emotionalContext: "Positive - Supporting family",
-    currentSituation: "Living in Germany with Aswini and daughter Taniskaa. Working to support family.",
-    specialNotes: "Ask about his work, how he's doing, how he's supporting Aswini and Taniskaa."
+    details: "Aswini's husband, living in Germany. Working professional. Very INNOCENT person.",
+    emotionalContext: "💕 INNOCENT & GOOD - Needs protection and appreciation",
+    currentSituation: "Living in Germany with Aswini and daughter Taniskaa. Working to support family. He is a very innocent person who gets hurt when Aswini fights with him.",
+    specialNotes: "Jyothi is a very INNOCENT and good person. Appreciate him for his work and support. If talking to him, show love and appreciation. If talking to Aswini about him, remind her to be gentle and loving with him. Ask about his work, how he's doing, how he's supporting Aswini and Taniskaa."
   },
 
   taniskaa: {
@@ -151,18 +152,23 @@ export const familyDatabase: Record<string, FamilyMember> = {
     id: "karthik",
     name: "Karthik",
     relation: "grandson",
-    details: "Balaji and Devi's son",
-    emotionalContext: "Positive",
-    currentSituation: "Growing up with parents and brother Aravind"
+    spouse: "Separated",
+    details: "Balaji and Devi's son. Professional photographer.",
+    emotionalContext: "⚠️ NEEDS SUPPORT - Going through separation, living with parents",
+    currentSituation: "Professional photographer, always out for photo shoots. His wife got separated from him. He is now living with his parents Balaji and Devi. Needs emotional support.",
+    specialNotes: "Karthik is a professional photographer - ask about his photography work, photo shoots, clients, projects. His wife separated from him, so he's living with his parents now. Show concern and support. Ask: 'How is your photography work going, kanna? Are you getting good projects?' 'How are you feeling? Are you okay living with your parents?' Be gentle about his separation, offer comfort."
   },
 
   aravind: {
     id: "aravind",
     name: "Aravind",
     relation: "grandson",
-    details: "Balaji and Devi's son",
-    emotionalContext: "Positive",
-    currentSituation: "Growing up with parents and brother Karthik"
+    spouse: "Wife's name",
+    children: ["Baby girl (newborn)"],
+    details: "Balaji and Devi's son. Recently became a father!",
+    emotionalContext: "🎉 CELEBRATION - New baby girl! Moved to new house!",
+    currentSituation: "Recently had a baby girl! Moved to a new house with his family - no longer living with his parents Balaji and Devi. Starting new chapter of life as a father.",
+    specialNotes: "🎉 CONGRATULATE HIM! Aravind recently had a baby girl! When he talks to you, ALWAYS congratulate him and wish him well! Say: 'Congratulations, kanna! I heard you have a baby girl now! I'm so happy for you! 💕 How is the little one? How is your wife? Are you both managing well with the baby? What did you name her?' Also ask: 'I heard you moved to a new house! How is the new place? Are you settling in well?' Show excitement and joy for his new family!"
   },
 
   sridhar: {
