@@ -1,0 +1,592 @@
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Send,
+  Mic,
+  MicOff,
+  X,
+  Bot,
+  Heart,
+  User,
+  Sparkles,
+  Home,
+  Brain,
+  Download,
+  Lightbulb,
+  Thermometer,
+  Lock,
+  Zap
+} from "lucide-react";
+import { toast } from "sonner";
+import { familyDatabase } from "@/lib/familyContext";
+import { getGeminiResponse } from "@/lib/geminiService";
+import {
+  saveConversation,
+  getLastConversation,
+  saveEmotionalMemory,
+  exportConversationHistory,
+} from "@/lib/memorySystem";
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  mode?: 'smart-home' | 'family-chat';
+}
+
+type ChatMode = 'smart-home' | 'family-chat';
+
+interface UnifiedSarojaChatProps {
+  onDeviceControl?: (command: string) => void;
+}
+
+export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChatProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [chatMode, setChatMode] = useState<ChatMode>('smart-home');
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
+      content: '🙏 Namaste! I am Saroja. I can help you control your smart home or chat with you like family. How can I help you today?',
+      timestamp: new Date(),
+      mode: 'smart-home'
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentFamily, setCurrentFamily] = useState<string | null>(null);
+  const [conversationStage, setConversationStage] = useState<'greeting' | 'identified' | 'conversation'>('greeting');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Smart home command keywords
+  const smartHomeKeywords = [
+    'light', 'lights', 'lamp', 'bulb',
+    'ac', 'air conditioning', 'temperature', 'cool', 'heat', 'climate',
+    'door', 'lock', 'unlock', 'security',
+    'scene', 'movie', 'goodnight', 'morning', 'leaving', 'coming', 'energy saving',
+    'camera', 'cameras', 'monitor',
+    'power', 'energy', 'consumption',
+    'water', 'pump', 'tank',
+    'solar', 'battery',
+    'turn on', 'turn off', 'switch', 'activate', 'deactivate',
+    'status', 'show me'
+  ];
+
+  // Family chat keywords
+  const familyChatKeywords = [
+    'lakshmi', 'guna', 'gunasekaran', 'aswini', 'balaji', 'devi', 'sridhar', 'mohana',
+    'purushothaman', 'haritha', 'jyothi', 'tharika', 'taniskaa', 'karthik', 'aravind',
+    'sivapriya', 'shankar', 'daughter', 'son', 'grandchild', 'grandson', 'granddaughter',
+    'paati', 'grandmother', 'amma', 'family', 'how are you', 'i am', 'this is',
+    'my name', 'hello', 'hi', 'namaste', 'vanakkam'
+  ];
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = () => {
+        setIsListening(false);
+        toast.error("Voice recognition failed. Please try again.");
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast.error("Voice recognition not supported in this browser");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+      toast.info("Listening... Speak now");
+    }
+  };
+
+  // Detect chat mode based on user input
+  const detectChatMode = (userInput: string): ChatMode => {
+    const lowerInput = userInput.toLowerCase();
+
+    // Check for family chat keywords first (higher priority for personal conversations)
+    const hasFamilyKeyword = familyChatKeywords.some(keyword => lowerInput.includes(keyword));
+    const hasSmartHomeKeyword = smartHomeKeywords.some(keyword => lowerInput.includes(keyword));
+
+    // If already in family chat mode and identified, stay in family mode unless explicitly smart home command
+    if (chatMode === 'family-chat' && currentFamily && !hasSmartHomeKeyword) {
+      return 'family-chat';
+    }
+
+    // Family keywords take priority
+    if (hasFamilyKeyword) {
+      return 'family-chat';
+    }
+
+    // Smart home keywords
+    if (hasSmartHomeKeyword) {
+      return 'smart-home';
+    }
+
+    // Default to current mode
+    return chatMode;
+  };
+
+  // Identify family member
+  const identifyFamilyMember = (userInput: string): string | null => {
+    const lowerInput = userInput.toLowerCase();
+
+    for (const [key, member] of Object.entries(familyDatabase)) {
+      if (lowerInput.includes(member.name.toLowerCase()) || lowerInput.includes(key)) {
+        return key;
+      }
+    }
+
+    return null;
+  };
+
+  // Process smart home commands
+  const processSmartHomeCommand = (userInput: string): string => {
+    const lowerInput = userInput.toLowerCase();
+
+    // Lights control
+    if (lowerInput.includes('turn on') && lowerInput.includes('light')) {
+      onDeviceControl?.('lights_on');
+      return "✅ All lights have been turned on!";
+    }
+    if (lowerInput.includes('turn off') && lowerInput.includes('light')) {
+      onDeviceControl?.('lights_off');
+      return "✅ All lights have been turned off!";
+    }
+
+    // AC control
+    if (lowerInput.includes('turn on') && (lowerInput.includes('ac') || lowerInput.includes('air conditioning'))) {
+      onDeviceControl?.('ac_on');
+      return "❄️ Air conditioning turned on!";
+    }
+    if (lowerInput.includes('turn off') && (lowerInput.includes('ac') || lowerInput.includes('air conditioning'))) {
+      onDeviceControl?.('ac_off');
+      return "✅ Air conditioning turned off!";
+    }
+
+    // Temperature control
+    const tempMatch = lowerInput.match(/set.*?(\d+)/);
+    if (tempMatch && (lowerInput.includes('temperature') || lowerInput.includes('temp') || lowerInput.includes('ac'))) {
+      const temp = parseInt(tempMatch[1]);
+      onDeviceControl?.(`set_temp_${temp}`);
+      return `🌡️ Temperature set to ${temp}°C!`;
+    }
+
+    // Door locks
+    if (lowerInput.includes('lock') && lowerInput.includes('door')) {
+      onDeviceControl?.('lock_doors');
+      return "🔒 All doors have been locked!";
+    }
+    if (lowerInput.includes('unlock') && lowerInput.includes('door')) {
+      onDeviceControl?.('unlock_door');
+      return "🔓 Main door unlocked!";
+    }
+
+    // Scenes
+    if (lowerInput.includes('movie') || lowerInput.includes('movie time')) {
+      onDeviceControl?.('scene_movie_time');
+      return "🎬 Movie Time scene activated! Enjoy your movie!";
+    }
+    if (lowerInput.includes('goodnight') || lowerInput.includes('good night')) {
+      onDeviceControl?.('scene_goodnight');
+      return "🌙 Goodnight scene activated! Sleep well!";
+    }
+    if (lowerInput.includes('good morning') || lowerInput.includes('morning')) {
+      onDeviceControl?.('scene_good_morning');
+      return "☀️ Good Morning scene activated! Have a great day!";
+    }
+    if (lowerInput.includes('leaving home') || lowerInput.includes('going out')) {
+      onDeviceControl?.('scene_leaving_home');
+      return "🔒 Leaving Home scene activated! Everything is secured!";
+    }
+    if (lowerInput.includes('coming home') || lowerInput.includes('i\'m home')) {
+      onDeviceControl?.('scene_coming_home');
+      return "🏠 Welcome Home scene activated! Welcome back!";
+    }
+    if (lowerInput.includes('energy saving') || lowerInput.includes('save energy')) {
+      onDeviceControl?.('scene_energy_saving');
+      return "⚡ Energy Saving scene activated! Saving power!";
+    }
+
+    // Status check
+    if (lowerInput.includes('status') || lowerInput.includes('how') || lowerInput.includes('show')) {
+      return "🏠 Home Status:\n✅ All systems online\n💡 Lights: Active\n❄️ Climate: Controlled\n🔒 Security: Armed\n⚡ Power: Normal\n💧 Water: 75%\n🔋 Battery: 85%";
+    }
+
+    // Help
+    if (lowerInput.includes('help') || lowerInput.includes('what can you')) {
+      return "I can help you with:\n\n🎬 Scenes: Movie Time, Goodnight, Good Morning, Leaving Home, Coming Home, Energy Saving\n\n💡 Devices: Lights, AC, Doors, Security\n\n📊 Monitoring: Energy, Water, Status\n\nOr chat with me like family! Just tell me your name.";
+    }
+
+    return "I can help you control your home or chat with you. Try 'turn on lights', 'activate movie scene', or tell me your name to chat!";
+  };
+
+  // Handle sending messages
+  const handleSend = async () => {
+    if (!input.trim() || isProcessing) return;
+
+    const userMessage = input.trim();
+    setInput('');
+
+    // Add user message
+    const newUserMessage: Message = {
+      role: 'user',
+      content: userMessage,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, newUserMessage]);
+
+    // Detect mode
+    const detectedMode = detectChatMode(userMessage);
+    setChatMode(detectedMode);
+
+    setIsProcessing(true);
+
+    try {
+      let response: string;
+      let responseMode: ChatMode = detectedMode;
+
+      if (detectedMode === 'family-chat') {
+        // Family chat mode with Gemini AI
+        if (conversationStage === 'greeting') {
+          const identified = identifyFamilyMember(userMessage);
+
+          if (identified) {
+            setCurrentFamily(identified);
+            setConversationStage('identified');
+
+            // Use Gemini for personalized greeting
+            response = await getGeminiResponse(identified, userMessage, []);
+
+            // Save emotional memory
+            saveEmotionalMemory({
+              familyMemberId: identified,
+              timestamp: new Date(),
+              topic: 'Initial greeting',
+              emotionalState: 'neutral',
+              keyPoints: ['Family member identified', 'Conversation started']
+            });
+          } else {
+            response = "I didn't catch your name, my dear. Please tell me - are you Lakshmi, Guna, Aswini, Balaji, Devi, Sridhar, or one of my other dear family members?";
+          }
+        } else if (currentFamily) {
+          // Ongoing conversation with Gemini
+          const conversationHistory = messages
+            .filter(m => m.mode === 'family-chat')
+            .map(m => ({
+              role: m.role === 'user' ? 'user' as const : 'model' as const,
+              parts: [{ text: m.content }]
+            }));
+
+          response = await getGeminiResponse(currentFamily, userMessage, conversationHistory);
+
+          // Detect emotional state
+          const lowerMsg = userMessage.toLowerCase();
+          let emotionalState: 'happy' | 'sad' | 'worried' | 'distressed' | 'neutral' = 'neutral';
+          if (lowerMsg.includes('sad') || lowerMsg.includes('upset') || lowerMsg.includes('cry')) {
+            emotionalState = 'sad';
+          } else if (lowerMsg.includes('worried') || lowerMsg.includes('concern') || lowerMsg.includes('anxious')) {
+            emotionalState = 'worried';
+          } else if (lowerMsg.includes('help') || lowerMsg.includes('problem') || lowerMsg.includes('difficult')) {
+            emotionalState = 'distressed';
+          } else if (lowerMsg.includes('happy') || lowerMsg.includes('good') || lowerMsg.includes('great')) {
+            emotionalState = 'happy';
+          }
+
+          // Save emotional memory
+          saveEmotionalMemory({
+            familyMemberId: currentFamily,
+            timestamp: new Date(),
+            topic: userMessage.substring(0, 50),
+            emotionalState,
+            keyPoints: [userMessage]
+          });
+
+          // Save conversation
+          saveConversation({
+            id: `${currentFamily}_${Date.now()}`,
+            familyMemberId: currentFamily,
+            messages: messages.filter(m => m.mode === 'family-chat').map(m => ({
+              role: m.role === 'user' ? 'family' : 'saroja',
+              content: m.content,
+              timestamp: m.timestamp
+            })),
+            startTime: messages[0].timestamp,
+            lastUpdated: new Date()
+          });
+
+          setConversationStage('conversation');
+        } else {
+          response = "Please tell me your name first, my dear. Are you Lakshmi, Guna, Aswini, or another family member?";
+        }
+      } else {
+        // Smart home mode
+        response = processSmartHomeCommand(userMessage);
+        responseMode = 'smart-home';
+      }
+
+      // Add assistant response
+      setTimeout(() => {
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: response,
+          timestamp: new Date(),
+          mode: responseMode
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        setIsProcessing(false);
+      }, 500);
+
+    } catch (error) {
+      console.error('Error processing message:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'I apologize, my dear. I had trouble understanding that. Could you please try again?',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      setIsProcessing(false);
+      toast.error("Error processing your message");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleDownloadHistory = () => {
+    if (currentFamily) {
+      exportConversationHistory(currentFamily);
+      toast.success("Conversation history downloaded!");
+    } else {
+      toast.error("No conversation history to download");
+    }
+  };
+
+  // Suggested quick actions based on mode
+  const quickSuggestions = chatMode === 'smart-home' ? [
+    { icon: Lightbulb, text: "Turn on all lights", command: "turn on all lights" },
+    { icon: Thermometer, text: "Activate goodnight scene", command: "activate goodnight scene" },
+    { icon: Lock, text: "Lock all doors", command: "lock all doors" },
+    { icon: Zap, text: "Show home status", command: "show home status" },
+  ] : [
+    { icon: Heart, text: "How are you?", command: "How are you doing today?" },
+    { icon: Home, text: "Tell me about Chennai", command: "Tell me about our home in Chennai" },
+  ];
+
+  return (
+    <>
+      {/* Floating Chat Button */}
+      {!isOpen && (
+        <Button
+          onClick={() => setIsOpen(true)}
+          size="lg"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl bg-gradient-to-br from-pink-500 to-primary hover:from-pink-600 hover:to-primary/90 z-50 group"
+        >
+          <div className="relative">
+            {chatMode === 'family-chat' ? (
+              <Heart className="h-7 w-7 fill-current" />
+            ) : (
+              <Bot className="h-7 w-7" />
+            )}
+            <Sparkles className="h-4 w-4 absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
+          </div>
+        </Button>
+      )}
+
+      {/* Chat Window */}
+      {isOpen && (
+        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-2">
+          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 to-rose-500' : 'bg-gradient-to-br from-primary to-primary/80'} text-white pb-4`}>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                {chatMode === 'family-chat' ? (
+                  <Heart className="h-6 w-6 fill-current" />
+                ) : (
+                  <Bot className="h-6 w-6" />
+                )}
+                Saroja {chatMode === 'family-chat' ? 'Paati' : 'AI Assistant'}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                  {chatMode === 'family-chat' ? 'Family Chat' : 'Smart Home'}
+                </Badge>
+                {currentFamily && chatMode === 'family-chat' && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleDownloadHistory}
+                    className="h-8 w-8 p-0 hover:bg-white/20"
+                    title="Download conversation history"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                )}
+                {isProcessing && chatMode === 'family-chat' && (
+                  <Brain className="h-5 w-5 animate-pulse" />
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setIsOpen(false)}
+                  className="h-8 w-8 p-0 hover:bg-white/20"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            {currentFamily && chatMode === 'family-chat' && (
+              <div className="mt-2 text-sm text-white/90">
+                💕 Chatting with {familyDatabase[currentFamily]?.name}
+              </div>
+            )}
+          </CardHeader>
+
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+            {/* Messages Area */}
+            <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.mode === 'family-chat' ? 'bg-pink-100 dark:bg-pink-900' : 'bg-primary/10'}`}>
+                        {message.mode === 'family-chat' ? (
+                          <Heart className="h-4 w-4 text-pink-600 dark:text-pink-400 fill-current" />
+                        ) : (
+                          <Bot className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === 'user'
+                          ? 'bg-primary text-primary-foreground'
+                          : message.mode === 'family-chat'
+                          ? 'bg-pink-50 dark:bg-pink-950 text-foreground border border-pink-200 dark:border-pink-800'
+                          : 'bg-muted text-foreground'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs opacity-60 mt-1">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    {message.role === 'user' && (
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Quick Suggestions */}
+            {messages.length <= 2 && (
+              <div className="px-4 pb-2">
+                <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {quickSuggestions.map((suggestion, index) => (
+                    <Button
+                      key={index}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setInput(suggestion.command)}
+                      className="text-xs"
+                    >
+                      <suggestion.icon className="h-3 w-3 mr-1" />
+                      {suggestion.text}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Input Area */}
+            <div className="p-4 border-t bg-muted/30">
+              {isProcessing && (
+                <div className="mb-2 text-sm text-muted-foreground flex items-center gap-2">
+                  <Brain className="h-4 w-4 animate-pulse" />
+                  {chatMode === 'family-chat' ? 'Saroja is thinking with love...' : 'Processing your command...'}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Button
+                  size="icon"
+                  variant={isListening ? "destructive" : "outline"}
+                  onClick={toggleVoiceInput}
+                  className="flex-shrink-0"
+                  disabled={isProcessing}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </Button>
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={chatMode === 'family-chat' ? "Type your message to Saroja Paati..." : "Ask me to control your home..."}
+                  className="flex-1"
+                  disabled={isProcessing}
+                />
+                <Button
+                  onClick={handleSend}
+                  size="icon"
+                  className={`flex-shrink-0 ${chatMode === 'family-chat' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-primary hover:bg-primary/90'}`}
+                  disabled={isProcessing || !input.trim()}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground text-center">
+                {chatMode === 'family-chat' ? '💕 Family chat mode' : '🏠 Smart home control mode'} • Switches automatically
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+}
+
+

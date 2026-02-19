@@ -28,11 +28,10 @@ import {
   CloudRain
 } from "lucide-react";
 import { useState } from "react";
-import SarojaAIChat from "@/components/SarojaAIChat";
+import UnifiedSarojaChat from "@/components/UnifiedSarojaChat";
 import SecurityCameraGrid from "@/components/SecurityCameraGrid";
 import EnergyAnalyticsDashboard from "@/components/EnergyAnalyticsDashboard";
 import AutomationRulesManager from "@/components/AutomationRulesManager";
-import SarojaFamilyChat from "@/components/SarojaFamilyChat";
 import { toast } from "sonner";
 
 export default function SmartHome() {
@@ -658,11 +657,8 @@ export default function SmartHome() {
         </div>
       </section>
 
-      {/* AI Chat Assistant */}
-      <SarojaAIChat onDeviceControl={handleAICommand} />
-
-      {/* Family Chat */}
-      <SarojaFamilyChat />
+      {/* Unified Saroja Chat - Smart Home + Family Chat */}
+      <UnifiedSarojaChat onDeviceControl={handleAICommand} />
     </div>
   );
 }
