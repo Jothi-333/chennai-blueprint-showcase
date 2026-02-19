@@ -456,89 +456,89 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
         </Button>
       )}
 
-      {/* Chat Window */}
+      {/* Chat Window - Clean Modern Design */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-4 border-white/20 overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 via-pink-500 to-rose-600' : 'bg-gradient-to-r from-orange-600 via-orange-500 to-red-600'} text-white p-4 shadow-lg`}>
+        <Card className="fixed bottom-6 right-6 w-[420px] h-[600px] shadow-xl z-50 flex flex-col border border-gray-200 overflow-hidden bg-white rounded-2xl">
+          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-500 to-rose-500' : 'bg-gradient-to-r from-orange-500 to-red-500'} text-white p-3`}>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg font-bold">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 {chatMode === 'family-chat' ? (
-                  <Heart className="h-6 w-6 fill-current" />
+                  <Heart className="h-5 w-5 fill-current" />
                 ) : (
-                  <Bot className="h-6 w-6" />
+                  <Bot className="h-5 w-5" />
                 )}
-                Saroja {chatMode === 'family-chat' ? 'Paati' : 'AI Assistant'}
+                Saroja {chatMode === 'family-chat' ? 'Paati' : 'AI'}
               </CardTitle>
-              <div className="flex items-center gap-2">
-                <Badge className="bg-white/30 text-white border-0 hover:bg-white/40">
-                  {chatMode === 'family-chat' ? 'Family Chat' : 'Smart Home'}
+              <div className="flex items-center gap-1">
+                <Badge className="bg-white/20 text-white border-0 text-xs px-2 py-0.5">
+                  {chatMode === 'family-chat' ? 'Family' : 'Smart Home'}
                 </Badge>
                 {currentFamily && chatMode === 'family-chat' && (
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleDownloadHistory}
-                    className="h-8 w-8 p-0 hover:bg-white/20 text-white"
-                    title="Download conversation history"
+                    className="h-7 w-7 p-0 hover:bg-white/20 text-white"
+                    title="Download history"
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-3.5 w-3.5" />
                   </Button>
                 )}
                 {isProcessing && chatMode === 'family-chat' && (
-                  <Brain className="h-5 w-5 animate-pulse" />
+                  <Brain className="h-4 w-4 animate-pulse" />
                 )}
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 p-0 hover:bg-white/20 text-white"
+                  className="h-7 w-7 p-0 hover:bg-white/20 text-white"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
             {currentFamily && chatMode === 'family-chat' && (
-              <div className="mt-2 text-sm text-white/95 font-medium">
-                💕 Chatting with {familyDatabase[currentFamily]?.name}
+              <div className="mt-1 text-xs text-white/90">
+                💕 {familyDatabase[currentFamily]?.name}
               </div>
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-slate-800 to-slate-900">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gray-50">
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4 bg-slate-900/50" ref={scrollRef}>
-              <div className="space-y-4">
+            <ScrollArea className="flex-1 p-3" ref={scrollRef}>
+              <div className="space-y-3">
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {message.role === 'assistant' && (
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${message.mode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 to-rose-500' : 'bg-gradient-to-br from-orange-500 to-red-500'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.mode === 'family-chat' ? 'bg-pink-500' : 'bg-orange-500'}`}>
                         {message.mode === 'family-chat' ? (
-                          <Heart className="h-5 w-5 text-white fill-current" />
+                          <Heart className="h-4 w-4 text-white fill-current" />
                         ) : (
-                          <Bot className="h-5 w-5 text-white" />
+                          <Bot className="h-4 w-4 text-white" />
                         )}
                       </div>
                     )}
                     <div
-                      className={`max-w-[75%] rounded-2xl p-4 shadow-lg ${
+                      className={`max-w-[75%] rounded-2xl px-3 py-2 ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-2 border-blue-400'
+                          ? 'bg-blue-600 text-white'
                           : message.mode === 'family-chat'
-                          ? 'bg-gradient-to-br from-pink-50 to-rose-50 text-gray-900 border-2 border-pink-300 shadow-pink-200/50'
-                          : 'bg-gradient-to-br from-orange-50 to-red-50 text-gray-900 border-2 border-orange-300 shadow-orange-200/50'
+                          ? 'bg-white text-gray-900 border border-pink-200'
+                          : 'bg-white text-gray-900 border border-orange-200'
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap font-medium">{message.content}</p>
-                      <p className={`text-xs mt-2 font-semibold ${message.role === 'user' ? 'text-blue-200' : 'text-gray-600'}`}>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <p className={`text-xs mt-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                     {message.role === 'user' && (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-md">
-                        <User className="h-5 w-5 text-white" />
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                        <User className="h-4 w-4 text-white" />
                       </div>
                     )}
                   </div>
@@ -548,16 +548,16 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
 
             {/* Quick Suggestions */}
             {messages.length <= 2 && (
-              <div className="px-4 pb-3 bg-slate-800/80 border-t border-slate-700">
-                <p className="text-xs font-semibold text-slate-300 mb-2">Quick actions:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="px-3 pb-2 bg-white border-t border-gray-200">
+                <p className="text-xs text-gray-600 mb-2 mt-2">Quick actions:</p>
+                <div className="flex flex-wrap gap-1.5">
                   {quickSuggestions.map((suggestion, index) => (
                     <Button
                       key={index}
                       size="sm"
                       variant="outline"
                       onClick={() => setInput(suggestion.command)}
-                      className={`text-xs border-2 hover:scale-105 transition-transform text-white ${chatMode === 'family-chat' ? 'border-pink-400 bg-pink-600/20 hover:bg-pink-600/40' : 'border-orange-400 bg-orange-600/20 hover:bg-orange-600/40'}`}
+                      className={`text-xs h-7 ${chatMode === 'family-chat' ? 'border-pink-300 text-pink-700 hover:bg-pink-50' : 'border-orange-300 text-orange-700 hover:bg-orange-50'}`}
                     >
                       <suggestion.icon className="h-3 w-3 mr-1" />
                       {suggestion.text}
@@ -567,45 +567,43 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
               </div>
             )}
 
-            {/* Input Area */}
-            <div className="p-4 border-t-4 border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 shadow-2xl">
+            {/* Input Area - Clean & Professional */}
+            <div className="p-3 bg-white border-t border-gray-200">
               {isProcessing && (
-                <div className="mb-3 text-sm font-bold flex items-center gap-2 text-white bg-purple-600/30 px-3 py-2 rounded-lg border border-purple-500/50">
-                  <Brain className="h-5 w-5 animate-pulse text-purple-300" />
-                  {chatMode === 'family-chat' ? 'Saroja is thinking with love...' : 'Processing your command...'}
+                <div className="mb-2 text-xs flex items-center gap-2 text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg">
+                  <Brain className="h-4 w-4 animate-pulse" />
+                  {chatMode === 'family-chat' ? 'Saroja is thinking...' : 'Processing...'}
                 </div>
               )}
-              <div className="flex gap-3">
+              <div className="flex gap-2 items-center">
                 <Button
                   size="icon"
-                  variant={isListening ? "destructive" : "outline"}
+                  variant="ghost"
                   onClick={toggleVoiceInput}
-                  className={`flex-shrink-0 h-12 w-12 border-3 shadow-lg ${isListening ? 'bg-red-600 border-red-400' : 'bg-slate-700 border-slate-500 hover:bg-slate-600 text-white'}`}
+                  className={`flex-shrink-0 h-10 w-10 rounded-full ${isListening ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'text-gray-600 hover:bg-gray-100'}`}
                   disabled={isProcessing}
                 >
-                  {isListening ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </Button>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={chatMode === 'family-chat' ? "Type your message to Saroja Paati..." : "Ask me to control your home..."}
-                  className="flex-1 h-12 border-3 border-white/30 bg-white text-gray-900 placeholder:text-gray-500 focus:bg-white focus:border-white/60 font-medium text-base shadow-lg rounded-xl px-4"
+                  placeholder={chatMode === 'family-chat' ? "Message Saroja Paati..." : "Control your home..."}
+                  className="flex-1 h-10 bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-gray-400 text-sm rounded-full px-4"
                   disabled={isProcessing}
                 />
                 <Button
                   onClick={handleSend}
                   size="icon"
-                  className={`flex-shrink-0 h-12 w-12 shadow-xl border-2 border-white/30 ${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-600 via-pink-500 to-rose-600 hover:from-pink-700 hover:via-pink-600 hover:to-rose-700' : 'bg-gradient-to-br from-orange-600 via-orange-500 to-red-600 hover:from-orange-700 hover:via-orange-600 hover:to-red-700'}`}
+                  className={`flex-shrink-0 h-10 w-10 rounded-full ${chatMode === 'family-chat' ? 'bg-pink-600 hover:bg-pink-700' : 'bg-orange-600 hover:bg-orange-700'} text-white`}
                   disabled={isProcessing || !input.trim()}
                 >
-                  <Send className="h-6 w-6" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="mt-3 text-xs font-bold text-center">
-                <span className={`inline-flex items-center gap-1 px-4 py-2 rounded-full shadow-lg border-2 ${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600 border-pink-400 text-white' : 'bg-gradient-to-r from-orange-600 to-red-600 border-orange-400 text-white'}`}>
-                  {chatMode === 'family-chat' ? '💕 Family chat mode' : '🏠 Smart home mode'} • Switches automatically
-                </span>
+              <div className="mt-2 text-xs text-center text-gray-500">
+                {chatMode === 'family-chat' ? '💕 Family chat' : '🏠 Smart home'} • Switches automatically
               </div>
             </div>
           </CardContent>
