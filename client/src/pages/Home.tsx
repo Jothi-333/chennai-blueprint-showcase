@@ -125,7 +125,7 @@ export default function Home() {
                   <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl" />
                   <div className="relative aspect-[3/4] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl">
                     <img
-                      src="/images/saroja/Saroja.jpg"
+                      src="/images/Saroja.jpg"
                       alt="Saroja Ammal"
                       className="w-full h-full object-cover"
                     />
