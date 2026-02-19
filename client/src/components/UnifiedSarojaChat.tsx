@@ -82,8 +82,8 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     'lakshmi', 'guna', 'gunasekaran', 'aswini', 'balaji', 'devi', 'sridhar', 'mohana',
     'purushothaman', 'haritha', 'jyothi', 'tharika', 'taniskaa', 'karthik', 'aravind',
     'sivapriya', 'shankar', 'daughter', 'son', 'grandchild', 'grandson', 'granddaughter',
-    'paati', 'grandmother', 'amma', 'family', 'how are you', 'i am', 'this is',
-    'my name', 'hello', 'hi', 'namaste', 'vanakkam'
+    'paati', 'grandmother', 'amma', 'family', 'i am', 'this is',
+    'my name', 'hello', 'hi', 'namaste', 'vanakkam', 'who are you', 'tell me about'
   ];
 
   // Auto-scroll to bottom
@@ -143,8 +143,18 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     const hasFamilyKeyword = familyChatKeywords.some(keyword => lowerInput.includes(keyword));
     const hasSmartHomeKeyword = smartHomeKeywords.some(keyword => lowerInput.includes(keyword));
 
+    // Personal questions should go to family chat mode
+    const personalQuestions = ['how are you', 'how do you feel', 'are you okay', 'are you well',
+                               'what are you doing', 'how have you been', 'how is your day'];
+    const isPersonalQuestion = personalQuestions.some(q => lowerInput.includes(q));
+
     // If already in family chat mode and identified, stay in family mode unless explicitly smart home command
     if (chatMode === 'family-chat' && currentFamily && !hasSmartHomeKeyword) {
+      return 'family-chat';
+    }
+
+    // Personal questions go to family chat
+    if (isPersonalQuestion) {
       return 'family-chat';
     }
 
@@ -156,6 +166,12 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     // Smart home keywords
     if (hasSmartHomeKeyword) {
       return 'smart-home';
+    }
+
+    // If no clear keywords, check if it's a greeting or personal message
+    const greetingPatterns = /^(hi|hello|hey|namaste|vanakkam|good morning|good evening)/i;
+    if (greetingPatterns.test(lowerInput)) {
+      return 'family-chat';
     }
 
     // Default to current mode
@@ -302,7 +318,15 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
               keyPoints: ['Family member identified', 'Conversation started']
             });
           } else {
-            response = "I didn't catch your name, my dear. Please tell me - are you Lakshmi, Guna, Aswini, Balaji, Devi, Sridhar, or one of my other dear family members?";
+            // If no family member identified but it's a personal question, respond warmly
+            const personalQuestions = ['how are you', 'how do you feel', 'are you okay'];
+            const isPersonalQ = personalQuestions.some(q => userMessage.toLowerCase().includes(q));
+
+            if (isPersonalQ) {
+              response = "💕 I'm doing well, my dear! But I don't know who I'm talking to yet. Please tell me your name - are you Lakshmi, Guna, Aswini, Balaji, Devi, Sridhar, or one of my other dear family members? Then we can have a proper conversation!";
+            } else {
+              response = "I didn't catch your name, my dear. Please tell me - are you Lakshmi, Guna, Aswini, Balaji, Devi, Sridhar, or one of my other dear family members?";
+            }
           }
         } else if (currentFamily) {
           // Ongoing conversation with Gemini
@@ -434,10 +458,10 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-2">
-          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 to-rose-500' : 'bg-gradient-to-br from-primary to-primary/80'} text-white pb-4`}>
+        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white dark:bg-gray-900">
+          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600' : 'bg-gradient-to-r from-orange-600 to-red-600'} text-white p-4`}>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg font-bold">
                 {chatMode === 'family-chat' ? (
                   <Heart className="h-6 w-6 fill-current" />
                 ) : (
@@ -446,7 +470,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                 Saroja {chatMode === 'family-chat' ? 'Paati' : 'AI Assistant'}
               </CardTitle>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Badge className="bg-white/30 text-white border-0 hover:bg-white/40">
                   {chatMode === 'family-chat' ? 'Family Chat' : 'Smart Home'}
                 </Badge>
                 {currentFamily && chatMode === 'family-chat' && (
@@ -454,7 +478,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                     size="sm"
                     variant="ghost"
                     onClick={handleDownloadHistory}
-                    className="h-8 w-8 p-0 hover:bg-white/20"
+                    className="h-8 w-8 p-0 hover:bg-white/20 text-white"
                     title="Download conversation history"
                   >
                     <Download className="h-4 w-4" />
@@ -467,20 +491,20 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                   size="sm"
                   variant="ghost"
                   onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 p-0 hover:bg-white/20"
+                  className="h-8 w-8 p-0 hover:bg-white/20 text-white"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
             </div>
             {currentFamily && chatMode === 'family-chat' && (
-              <div className="mt-2 text-sm text-white/90">
+              <div className="mt-2 text-sm text-white/95 font-medium">
                 💕 Chatting with {familyDatabase[currentFamily]?.name}
               </div>
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gray-50 dark:bg-gray-950">
             {/* Messages Area */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               <div className="space-y-4">
@@ -490,31 +514,31 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                     className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {message.role === 'assistant' && (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.mode === 'family-chat' ? 'bg-pink-100 dark:bg-pink-900' : 'bg-primary/10'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${message.mode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 to-rose-500' : 'bg-gradient-to-br from-orange-500 to-red-500'}`}>
                         {message.mode === 'family-chat' ? (
-                          <Heart className="h-4 w-4 text-pink-600 dark:text-pink-400 fill-current" />
+                          <Heart className="h-5 w-5 text-white fill-current" />
                         ) : (
-                          <Bot className="h-4 w-4 text-primary" />
+                          <Bot className="h-5 w-5 text-white" />
                         )}
                       </div>
                     )}
                     <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
+                      className={`max-w-[75%] rounded-2xl p-4 shadow-sm ${
                         message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
                           : message.mode === 'family-chat'
-                          ? 'bg-pink-50 dark:bg-pink-950 text-foreground border border-pink-200 dark:border-pink-800'
-                          : 'bg-muted text-foreground'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-pink-200 dark:border-pink-800'
+                          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-orange-200 dark:border-orange-800'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className="text-xs opacity-60 mt-1">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                     {message.role === 'user' && (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <User className="h-4 w-4 text-primary" />
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <User className="h-5 w-5 text-white" />
                       </div>
                     )}
                   </div>
@@ -524,8 +548,8 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
 
             {/* Quick Suggestions */}
             {messages.length <= 2 && (
-              <div className="px-4 pb-2">
-                <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
+              <div className="px-4 pb-3 bg-gray-50 dark:bg-gray-950">
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Quick actions:</p>
                 <div className="flex flex-wrap gap-2">
                   {quickSuggestions.map((suggestion, index) => (
                     <Button
@@ -533,7 +557,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                       size="sm"
                       variant="outline"
                       onClick={() => setInput(suggestion.command)}
-                      className="text-xs"
+                      className={`text-xs border-2 hover:scale-105 transition-transform ${chatMode === 'family-chat' ? 'border-pink-300 hover:bg-pink-50 dark:border-pink-800 dark:hover:bg-pink-950' : 'border-orange-300 hover:bg-orange-50 dark:border-orange-800 dark:hover:bg-orange-950'}`}
                     >
                       <suggestion.icon className="h-3 w-3 mr-1" />
                       {suggestion.text}
@@ -544,10 +568,10 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
             )}
 
             {/* Input Area */}
-            <div className="p-4 border-t bg-muted/30">
+            <div className="p-4 border-t-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
               {isProcessing && (
-                <div className="mb-2 text-sm text-muted-foreground flex items-center gap-2">
-                  <Brain className="h-4 w-4 animate-pulse" />
+                <div className="mb-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <Brain className="h-4 w-4 animate-pulse text-purple-600" />
                   {chatMode === 'family-chat' ? 'Saroja is thinking with love...' : 'Processing your command...'}
                 </div>
               )}
@@ -556,30 +580,32 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                   size="icon"
                   variant={isListening ? "destructive" : "outline"}
                   onClick={toggleVoiceInput}
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 h-11 w-11 border-2"
                   disabled={isProcessing}
                 >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </Button>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={chatMode === 'family-chat' ? "Type your message to Saroja Paati..." : "Ask me to control your home..."}
-                  className="flex-1"
+                  className="flex-1 h-11 border-2 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900"
                   disabled={isProcessing}
                 />
                 <Button
                   onClick={handleSend}
                   size="icon"
-                  className={`flex-shrink-0 ${chatMode === 'family-chat' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-primary hover:bg-primary/90'}`}
+                  className={`flex-shrink-0 h-11 w-11 shadow-md ${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700' : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700'}`}
                   disabled={isProcessing || !input.trim()}
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-5 w-5" />
                 </Button>
               </div>
-              <div className="mt-2 text-xs text-muted-foreground text-center">
-                {chatMode === 'family-chat' ? '💕 Family chat mode' : '🏠 Smart home control mode'} • Switches automatically
+              <div className="mt-3 text-xs font-medium text-center">
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full ${chatMode === 'family-chat' ? 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300' : 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300'}`}>
+                  {chatMode === 'family-chat' ? '💕 Family chat mode' : '🏠 Smart home mode'} • Switches automatically
+                </span>
               </div>
             </div>
           </CardContent>
