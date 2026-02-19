@@ -121,13 +121,17 @@ export default function Home() {
             <Card className="border-primary/30 bg-card/50 overflow-hidden">
               <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
                 {/* Saroja's Photo */}
-                <div className="relative">
+                <div className="relative flex items-center justify-center">
                   <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl" />
-                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl">
+                  <div className="relative w-full max-w-[300px] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl bg-card">
                     <img
                       src="/images/Saroja.jpg"
                       alt="Saroja Ammal"
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto object-cover"
+                      onError={(e) => {
+                        console.error('Image failed to load:', e);
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400"%3E%3Crect fill="%23333" width="300" height="400"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage Not Found%3C/text%3E%3C/svg%3E';
+                      }}
                     />
                   </div>
                 </div>
