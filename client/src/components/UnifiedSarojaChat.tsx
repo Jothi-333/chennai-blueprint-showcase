@@ -443,23 +443,23 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
         <Button
           onClick={() => setIsOpen(true)}
           size="lg"
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl bg-gradient-to-br from-pink-500 to-primary hover:from-pink-600 hover:to-primary/90 z-50 group"
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl border-4 border-white/30 bg-gradient-to-br from-pink-600 via-pink-500 to-rose-600 hover:from-pink-700 hover:via-pink-600 hover:to-rose-700 z-50 group animate-pulse hover:animate-none"
         >
           <div className="relative">
             {chatMode === 'family-chat' ? (
-              <Heart className="h-7 w-7 fill-current" />
+              <Heart className="h-8 w-8 fill-current text-white" />
             ) : (
-              <Bot className="h-7 w-7" />
+              <Bot className="h-8 w-8 text-white" />
             )}
-            <Sparkles className="h-4 w-4 absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
+            <Sparkles className="h-5 w-5 absolute -top-1 -right-1 text-yellow-300 animate-spin" />
           </div>
         </Button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white dark:bg-gray-900">
-          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600' : 'bg-gradient-to-r from-orange-600 to-red-600'} text-white p-4`}>
+        <Card className="fixed bottom-6 right-6 w-[450px] h-[650px] shadow-2xl z-50 flex flex-col border-4 border-white/20 overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+          <CardHeader className={`${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 via-pink-500 to-rose-600' : 'bg-gradient-to-r from-orange-600 via-orange-500 to-red-600'} text-white p-4 shadow-lg`}>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg font-bold">
                 {chatMode === 'family-chat' ? (
@@ -504,9 +504,9 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
             )}
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gray-50 dark:bg-gray-950">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-slate-800 to-slate-900">
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+            <ScrollArea className="flex-1 p-4 bg-slate-900/50" ref={scrollRef}>
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
@@ -523,16 +523,16 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                       </div>
                     )}
                     <div
-                      className={`max-w-[75%] rounded-2xl p-4 shadow-sm ${
+                      className={`max-w-[75%] rounded-2xl p-4 shadow-lg ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
+                          ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-2 border-blue-400'
                           : message.mode === 'family-chat'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-pink-200 dark:border-pink-800'
-                          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-2 border-orange-200 dark:border-orange-800'
+                          ? 'bg-gradient-to-br from-pink-50 to-rose-50 text-gray-900 border-2 border-pink-300 shadow-pink-200/50'
+                          : 'bg-gradient-to-br from-orange-50 to-red-50 text-gray-900 border-2 border-orange-300 shadow-orange-200/50'
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                      <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap font-medium">{message.content}</p>
+                      <p className={`text-xs mt-2 font-semibold ${message.role === 'user' ? 'text-blue-200' : 'text-gray-600'}`}>
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -548,8 +548,8 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
 
             {/* Quick Suggestions */}
             {messages.length <= 2 && (
-              <div className="px-4 pb-3 bg-gray-50 dark:bg-gray-950">
-                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Quick actions:</p>
+              <div className="px-4 pb-3 bg-slate-800/80 border-t border-slate-700">
+                <p className="text-xs font-semibold text-slate-300 mb-2">Quick actions:</p>
                 <div className="flex flex-wrap gap-2">
                   {quickSuggestions.map((suggestion, index) => (
                     <Button
@@ -557,7 +557,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                       size="sm"
                       variant="outline"
                       onClick={() => setInput(suggestion.command)}
-                      className={`text-xs border-2 hover:scale-105 transition-transform ${chatMode === 'family-chat' ? 'border-pink-300 hover:bg-pink-50 dark:border-pink-800 dark:hover:bg-pink-950' : 'border-orange-300 hover:bg-orange-50 dark:border-orange-800 dark:hover:bg-orange-950'}`}
+                      className={`text-xs border-2 hover:scale-105 transition-transform text-white ${chatMode === 'family-chat' ? 'border-pink-400 bg-pink-600/20 hover:bg-pink-600/40' : 'border-orange-400 bg-orange-600/20 hover:bg-orange-600/40'}`}
                     >
                       <suggestion.icon className="h-3 w-3 mr-1" />
                       {suggestion.text}
@@ -568,42 +568,42 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
             )}
 
             {/* Input Area */}
-            <div className="p-4 border-t-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div className="p-4 border-t-4 border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 shadow-2xl">
               {isProcessing && (
-                <div className="mb-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Brain className="h-4 w-4 animate-pulse text-purple-600" />
+                <div className="mb-3 text-sm font-bold flex items-center gap-2 text-white bg-purple-600/30 px-3 py-2 rounded-lg border border-purple-500/50">
+                  <Brain className="h-5 w-5 animate-pulse text-purple-300" />
                   {chatMode === 'family-chat' ? 'Saroja is thinking with love...' : 'Processing your command...'}
                 </div>
               )}
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button
                   size="icon"
                   variant={isListening ? "destructive" : "outline"}
                   onClick={toggleVoiceInput}
-                  className="flex-shrink-0 h-11 w-11 border-2"
+                  className={`flex-shrink-0 h-12 w-12 border-3 shadow-lg ${isListening ? 'bg-red-600 border-red-400' : 'bg-slate-700 border-slate-500 hover:bg-slate-600 text-white'}`}
                   disabled={isProcessing}
                 >
-                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                  {isListening ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
                 </Button>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={chatMode === 'family-chat' ? "Type your message to Saroja Paati..." : "Ask me to control your home..."}
-                  className="flex-1 h-11 border-2 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900"
+                  className="flex-1 h-12 border-3 border-white/30 bg-white text-gray-900 placeholder:text-gray-500 focus:bg-white focus:border-white/60 font-medium text-base shadow-lg rounded-xl px-4"
                   disabled={isProcessing}
                 />
                 <Button
                   onClick={handleSend}
                   size="icon"
-                  className={`flex-shrink-0 h-11 w-11 shadow-md ${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700' : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700'}`}
+                  className={`flex-shrink-0 h-12 w-12 shadow-xl border-2 border-white/30 ${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-600 via-pink-500 to-rose-600 hover:from-pink-700 hover:via-pink-600 hover:to-rose-700' : 'bg-gradient-to-br from-orange-600 via-orange-500 to-red-600 hover:from-orange-700 hover:via-orange-600 hover:to-red-700'}`}
                   disabled={isProcessing || !input.trim()}
                 >
-                  <Send className="h-5 w-5" />
+                  <Send className="h-6 w-6" />
                 </Button>
               </div>
-              <div className="mt-3 text-xs font-medium text-center">
-                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full ${chatMode === 'family-chat' ? 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300' : 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300'}`}>
+              <div className="mt-3 text-xs font-bold text-center">
+                <span className={`inline-flex items-center gap-1 px-4 py-2 rounded-full shadow-lg border-2 ${chatMode === 'family-chat' ? 'bg-gradient-to-r from-pink-600 to-rose-600 border-pink-400 text-white' : 'bg-gradient-to-r from-orange-600 to-red-600 border-orange-400 text-white'}`}>
                   {chatMode === 'family-chat' ? '💕 Family chat mode' : '🏠 Smart home mode'} • Switches automatically
                 </span>
               </div>
