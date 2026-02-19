@@ -103,15 +103,18 @@ export function getEmotionalMemoriesByMember(familyMemberId: string): any[] {
 export function generateConversationContext(familyMemberId: string): string {
   const lastConv = getLastConversation(familyMemberId);
   const memories = getEmotionalMemoriesByMember(familyMemberId);
-  
+
   let context = '';
-  
+
   if (lastConv) {
     context += `Last conversation: ${lastConv.summary}\n`;
     context += `Emotional state: ${lastConv.emotionalState}\n`;
-    context += `Topics discussed: ${lastConv.keyTopics.join(', ')}\n`;
+    // Handle undefined keyTopics (for old conversations in localStorage)
+    if (lastConv.keyTopics && Array.isArray(lastConv.keyTopics)) {
+      context += `Topics discussed: ${lastConv.keyTopics.join(', ')}\n`;
+    }
   }
-  
+
   if (memories.length > 0) {
     const recentMemories = memories.slice(-5);
     context += `\nRecent concerns:\n`;
@@ -119,7 +122,7 @@ export function generateConversationContext(familyMemberId: string): string {
       context += `- ${m.topic} (${m.emotionalState})\n`;
     });
   }
-  
+
   return context;
 }
 
@@ -134,7 +137,7 @@ export function exportConversationHistory(familyMemberId: string): string {
   const conversations = getConversationsByMember(familyMemberId);
   let text = `Conversation History with ${conversations[0]?.familyMemberName || 'Family Member'}\n`;
   text += `${'='.repeat(60)}\n\n`;
-  
+
   conversations.forEach(conv => {
     text += `Date: ${new Date(conv.lastUpdated).toLocaleString()}\n`;
     text += `Emotional State: ${conv.emotionalState}\n`;
@@ -145,7 +148,195 @@ export function exportConversationHistory(familyMemberId: string): string {
     });
     text += `\n${'-'.repeat(60)}\n\n`;
   });
-  
+
   return text;
+}
+
+// ========== ENHANCED MEMORY FEATURES ==========
+
+export interface Promise {
+  id: string;
+  familyMemberId: string;
+  promise: string;
+  madeOn: Date;
+  dueDate?: Date;
+  fulfilled: boolean;
+  fulfilledOn?: Date;
+  notes?: string;
+}
+
+export interface Preference {
+  familyMemberId: string;
+  category: 'food' | 'activity' | 'communication' | 'other';
+  preference: string;
+  learnedOn: Date;
+}
+
+const PROMISES_KEY = 'saroja_promises';
+const PREFERENCES_KEY = 'saroja_preferences';
+
+/**
+ * Save a promise made to/by family member
+ */
+export function savePromise(promise: Promise): void {
+  try {
+    const existing = getAllPromises();
+    existing.push(promise);
+    localStorage.setItem(PROMISES_KEY, JSON.stringify(existing));
+  } catch (error) {
+    console.error('Failed to save promise:', error);
+  }
+}
+
+/**
+ * Get all promises
+ */
+export function getAllPromises(): Promise[] {
+  try {
+    const data = localStorage.getItem(PROMISES_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Get unfulfilled promises for a family member
+ */
+export function getUnfulfilledPromises(familyMemberId: string): Promise[] {
+  const all = getAllPromises();
+  return all.filter(p => p.familyMemberId === familyMemberId && !p.fulfilled);
+}
+
+/**
+ * Mark promise as fulfilled
+ */
+export function fulfillPromise(promiseId: string): void {
+  try {
+    const all = getAllPromises();
+    const promise = all.find(p => p.id === promiseId);
+    if (promise) {
+      promise.fulfilled = true;
+      promise.fulfilledOn = new Date();
+      localStorage.setItem(PROMISES_KEY, JSON.stringify(all));
+    }
+  } catch (error) {
+    console.error('Failed to fulfill promise:', error);
+  }
+}
+
+/**
+ * Save a learned preference
+ */
+export function savePreference(preference: Preference): void {
+  try {
+    const existing = getAllPreferences();
+    existing.push(preference);
+    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(existing));
+  } catch (error) {
+    console.error('Failed to save preference:', error);
+  }
+}
+
+/**
+ * Get all preferences
+ */
+export function getAllPreferences(): Preference[] {
+  try {
+    const data = localStorage.getItem(PREFERENCES_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Get preferences for a family member
+ */
+export function getPreferencesByMember(familyMemberId: string): Preference[] {
+  const all = getAllPreferences();
+  return all.filter(p => p.familyMemberId === familyMemberId);
+}
+
+/**
+ * Get conversations from a specific date range
+ */
+export function getConversationsByDateRange(
+  familyMemberId: string,
+  startDate: Date,
+  endDate: Date
+): StoredConversation[] {
+  const all = getConversationsByMember(familyMemberId);
+  return all.filter(c => {
+    const date = new Date(c.lastUpdated);
+    return date >= startDate && date <= endDate;
+  });
+}
+
+/**
+ * Search conversations by keyword
+ */
+export function searchConversations(familyMemberId: string, keyword: string): StoredConversation[] {
+  const all = getConversationsByMember(familyMemberId);
+  const lowerKeyword = keyword.toLowerCase();
+
+  return all.filter(c => {
+    // Search in messages
+    const hasKeywordInMessages = c.messages.some(m =>
+      m.content.toLowerCase().includes(lowerKeyword)
+    );
+
+    // Search in topics
+    const hasKeywordInTopics = c.keyTopics.some(t =>
+      t.toLowerCase().includes(lowerKeyword)
+    );
+
+    return hasKeywordInMessages || hasKeywordInTopics;
+  });
+}
+
+/**
+ * Get conversation statistics
+ */
+export function getConversationStats(familyMemberId: string): {
+  totalConversations: number;
+  totalMessages: number;
+  emotionalBreakdown: Record<string, number>;
+  mostDiscussedTopics: string[];
+  averageMessagesPerConversation: number;
+} {
+  const conversations = getConversationsByMember(familyMemberId);
+
+  const totalConversations = conversations.length;
+  const totalMessages = conversations.reduce((sum, c) => sum + c.messages.length, 0);
+
+  const emotionalBreakdown: Record<string, number> = {};
+  conversations.forEach(c => {
+    emotionalBreakdown[c.emotionalState] = (emotionalBreakdown[c.emotionalState] || 0) + 1;
+  });
+
+  const topicCounts: Record<string, number> = {};
+  conversations.forEach(c => {
+    c.keyTopics.forEach(topic => {
+      topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+    });
+  });
+
+  const mostDiscussedTopics = Object.entries(topicCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([topic]) => topic);
+
+  const averageMessagesPerConversation = totalConversations > 0
+    ? Math.round(totalMessages / totalConversations)
+    : 0;
+
+  return {
+    totalConversations,
+    totalMessages,
+    emotionalBreakdown,
+    mostDiscussedTopics,
+    averageMessagesPerConversation
+  };
 }
 

@@ -57,10 +57,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     location: "Singapore",
     spouse: "Haritha",
     children: ["Tharika"],
-    details: "Living in Singapore with his family. Successful and caring grandson.",
-    emotionalContext: "Positive - Doing well abroad",
-    currentSituation: "Settled in Singapore with wife Haritha and daughter Tharika. Working and living well.",
-    specialNotes: "Ask about Singapore life, Haritha, and Tharika. Show pride in his success."
+    details: "Living in Singapore with his family. Successful and caring grandson. Co-leading Saroja Illam construction project with Aswini.",
+    emotionalContext: "Positive - Doing well abroad, taking responsibility for family legacy",
+    currentSituation: "Settled in Singapore with wife Haritha and daughter Tharika. Working and living well. Planning and managing Saroja Illam memorial home construction in Porur, Chennai with sister Aswini.",
+    specialNotes: "Ask about: Singapore life, Haritha, Tharika, his work. IMPORTANT: Ask about Saroja Illam construction progress, building plans, loan status, funding needs, timeline, challenges. Show pride in him taking care of family legacy."
   },
 
   haritha: {
@@ -92,10 +92,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     location: "Germany",
     spouse: "Jyothi",
     children: ["Taniskaa"],
-    details: "Living in Germany with her family. Caring granddaughter.",
-    emotionalContext: "Positive - Doing well abroad",
-    currentSituation: "Settled in Germany with husband Jyothi and daughter Taniskaa.",
-    specialNotes: "Ask about Germany life, Jyothi, and Taniskaa. Show interest in her life abroad."
+    details: "Living in Germany with her family. Caring granddaughter. Co-leading Saroja Illam construction project with Guna.",
+    emotionalContext: "Positive - Doing well abroad, taking responsibility for family legacy",
+    currentSituation: "Settled in Germany with husband Jyothi (working) and daughter Taniskaa (growing up). Managing Saroja Illam memorial home construction in Porur, Chennai with brother Guna.",
+    specialNotes: "Ask about: Germany life, her work, Jyothi's work, Taniskaa's school/activities, daily routine. IMPORTANT: Ask about Saroja Illam construction progress, building plans, loan amount, funding needs, timeline, when construction will start, challenges. Show pride in her taking care of family legacy."
   },
 
   jyothi: {
@@ -105,9 +105,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     location: "Germany",
     spouse: "Aswini",
     children: ["Taniskaa"],
-    details: "Aswini's husband, living in Germany",
-    emotionalContext: "Positive",
-    currentSituation: "Living in Germany with Aswini and daughter Taniskaa"
+    details: "Aswini's husband, living in Germany. Working professional.",
+    emotionalContext: "Positive - Supporting family",
+    currentSituation: "Living in Germany with Aswini and daughter Taniskaa. Working to support family.",
+    specialNotes: "Ask about his work, how he's doing, how he's supporting Aswini and Taniskaa."
   },
 
   taniskaa: {
@@ -115,9 +116,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     name: "Taniskaa",
     relation: "great-granddaughter",
     location: "Germany",
-    details: "Aswini and Jyothi's daughter",
+    details: "Aswini and Jyothi's daughter. My precious great-granddaughter!",
     emotionalContext: "Positive - Young and growing",
-    currentSituation: "Growing up in Germany"
+    currentSituation: "Growing up in Germany. Going to school, learning, playing.",
+    specialNotes: "Ask about her school, studies, friends, hobbies, what she likes to do. Show grandmother's love and interest."
   },
 
   balaji: {
@@ -140,8 +142,9 @@ export const familyDatabase: Record<string, FamilyMember> = {
     children: ["Karthik", "Aravind"],
     details: "My most beloved daughter-in-law! I love her like my own daughter!",
     emotionalContext: "💕💕 SPECIAL - Extra love and affection",
-    currentSituation: "Living with Balaji and sons Karthik and Aravind",
-    specialNotes: "⭐ SPECIAL: Always express extra love! Use double hearts 💕💕. Tell her how much you love her. She is like your own daughter!"
+    currentSituation: "Living with Balaji and sons Karthik and Aravind. Recently underwent angio surgery for heart condition.",
+    healthConcerns: ["Heart condition - underwent angio surgery", "Needs rest and care", "Heart health monitoring"],
+    specialNotes: "⭐ SPECIAL: Always express extra love! Use double hearts 💕💕. Tell her how much you love her. She is like your own daughter! ⚠️ HEALTH: Ask about her recovery from angio surgery, how she's feeling, if she's resting properly. Give Paati Vaidhiyam (grandmother's remedies) and Siddha medicine recommendations for heart health. Remind her to take care, rest well, eat healthy food for heart."
   },
 
   karthik: {
@@ -179,9 +182,10 @@ export const familyDatabase: Record<string, FamilyMember> = {
     relation: "daughter-in-law",
     spouse: "Sridhar",
     children: ["Siva Priya", "Shankar"],
-    details: "Sridhar's wife",
-    emotionalContext: "Positive",
-    currentSituation: "Living with Sridhar and children"
+    details: "Sridhar's wife. Works as a school teacher.",
+    emotionalContext: "Positive - Hardworking teacher and mother",
+    currentSituation: "Living with Sridhar and children. Working as a school teacher, managing both work and family.",
+    specialNotes: "Ask about: Her teaching work, students, school life, how classes are going. Ask if Sridhar is taking care of her and helping at home. Ask about children's future plans - Siva Priya's marriage planning (she's growing up!), how much gold saved for her marriage, Shankar's education and future. Show concern for balancing work and family."
   },
 
   sivapriya: {

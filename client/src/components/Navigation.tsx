@@ -24,26 +24,24 @@ export default function Navigation() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/">
-          <a className="flex items-center gap-2 font-display font-bold text-xl hover:text-primary transition-colors">
-            <Building2 className="h-6 w-6 text-primary" />
-            <span>Saroja Illam</span>
-          </a>
+        <Link href="/" className="flex items-center gap-2 font-display font-bold text-xl hover:text-primary transition-colors">
+          <Building2 className="h-6 w-6 text-primary" />
+          <span>Saroja Illam</span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
-            <Link key={item.path} href={item.path}>
-              <a
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location === item.path
-                    ? "text-primary"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {item.label}
-              </a>
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                location === item.path
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {item.label}
             </Link>
           ))}
         </nav>
@@ -77,17 +75,17 @@ export default function Navigation() {
                   <span className="font-display font-bold text-xl">Saroja Illam</span>
                 </div>
                 {navItems.map((item) => (
-                  <Link key={item.path} href={item.path}>
-                    <a
-                      onClick={() => setIsOpen(false)}
-                      className={`text-sm font-medium transition-colors hover:text-primary block py-2 ${
-                        location === item.path
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {item.label}
-                    </a>
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => setIsOpen(false)}
+                    className={`text-sm font-medium transition-colors hover:text-primary block py-2 ${
+                      location === item.path
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {item.label}
                   </Link>
                 ))}
                 <Button

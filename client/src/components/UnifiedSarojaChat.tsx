@@ -19,7 +19,9 @@ import {
   Lightbulb,
   Thermometer,
   Lock,
-  Zap
+  Zap,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { toast } from "sonner";
 import { familyDatabase } from "@/lib/familyContext";
@@ -30,6 +32,7 @@ import {
   saveEmotionalMemory,
   exportConversationHistory,
 } from "@/lib/memorySystem";
+import { voiceService } from "@/lib/voiceService";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -44,13 +47,28 @@ interface UnifiedSarojaChatProps {
   onDeviceControl?: (command: string) => void;
 }
 
+// Helper function to get time-based Tamil greeting
+function getTimeBasedGreeting(): string {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return 'Kalai Vanakkam'; // Good morning in Tamil
+  } else if (hour >= 12 && hour < 16) {
+    return 'Vanakkam'; // Good afternoon
+  } else if (hour >= 16 && hour < 20) {
+    return 'Maalai Vanakkam'; // Good evening
+  } else {
+    return 'Vanakkam'; // Night time
+  }
+}
+
 export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('smart-home');
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '🙏 Namaste! I am Saroja. I can help you control your smart home or chat with you like family. How can I help you today?',
+      content: `🙏 ${getTimeBasedGreeting()}! I am Saroja. I can help you control your smart home or chat with you like family. How can I help you today?`,
       timestamp: new Date(),
       mode: 'smart-home'
     }
@@ -60,8 +78,12 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentFamily, setCurrentFamily] = useState<string | null>(null);
   const [conversationStage, setConversationStage] = useState<'greeting' | 'identified' | 'conversation'>('greeting');
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState<Date>(new Date());
 
   // Smart home command keywords
   const smartHomeKeywords = [
@@ -86,16 +108,45 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     'my name', 'hello', 'hi', 'namaste', 'vanakkam', 'who are you', 'tell me about'
   ];
 
-  // Auto-scroll to bottom - Fixed for Radix ScrollArea
+  // Auto-scroll to bottom - Fixed for native div scrolling
   useEffect(() => {
-    if (scrollRef.current) {
-      // Radix ScrollArea has a viewport element that needs to be scrolled
-      const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
+    const scrollToBottom = () => {
+      if (scrollRef.current) {
+        // Scroll the div element directly
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
       }
+    };
+
+    // Delay to allow DOM updates and animations
+    const timeoutId = setTimeout(scrollToBottom, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [messages, isProcessing]);
+
+  // Inactivity timer - Send proactive message after 6 seconds of no user input
+  useEffect(() => {
+    // Clear existing timer
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
     }
-  }, [messages]);
+
+    // Only set timer if chat is open, in family mode, family identified, and not processing
+    if (isOpen && chatMode === 'family-chat' && currentFamily && !isProcessing) {
+      inactivityTimerRef.current = setTimeout(() => {
+        generateProactiveMessage();
+      }, 6000); // 6 seconds
+    }
+
+    // Cleanup
+    return () => {
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
+    };
+  }, [messages, isOpen, chatMode, currentFamily, isProcessing]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -136,6 +187,49 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
       recognitionRef.current.start();
       setIsListening(true);
       toast.info("Listening... Speak now");
+    }
+  };
+
+  // Generate proactive message when user is inactive
+  const generateProactiveMessage = async (): Promise<void> => {
+    // Only send proactive messages in family chat mode with identified family member
+    if (chatMode !== 'family-chat' || !currentFamily || isProcessing) {
+      return;
+    }
+
+    // Don't send proactive message if last message was from Saroja
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.role === 'assistant') {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Get proactive message from Gemini
+      const conversationHistory = messages
+        .filter(m => m.mode === 'family-chat')
+        .map(m => ({
+          role: m.role === 'user' ? 'family' as const : 'saroja' as const,
+          content: m.content
+        }));
+
+      const proactivePrompt = "User hasn't responded. Start a new conversation topic by asking about something specific from their life.";
+      const response = await getGeminiResponse(currentFamily, proactivePrompt, conversationHistory);
+
+      const newMessage: Message = {
+        role: 'assistant',
+        content: response,
+        timestamp: new Date(),
+        mode: 'family-chat'
+      };
+
+      setMessages(prev => [...prev, newMessage]);
+      setLastMessageTime(new Date());
+    } catch (error) {
+      console.error('Error generating proactive message:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -283,17 +377,24 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     const userMessage = input.trim();
     setInput('');
 
-    // Add user message
+    // Reset inactivity timer
+    setLastMessageTime(new Date());
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+
+    // Detect mode FIRST
+    const detectedMode = detectChatMode(userMessage);
+    setChatMode(detectedMode);
+
+    // Add user message WITH mode
     const newUserMessage: Message = {
       role: 'user',
       content: userMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
+      mode: detectedMode  // ← ADD MODE HERE!
     };
     setMessages(prev => [...prev, newUserMessage]);
-
-    // Detect mode
-    const detectedMode = detectChatMode(userMessage);
-    setChatMode(detectedMode);
 
     setIsProcessing(true);
 
@@ -333,12 +434,14 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
             }
           }
         } else if (currentFamily) {
-          // Ongoing conversation with Gemini
+          // Ongoing conversation with Gemini - pass conversation history correctly
+          // Get all family-chat messages as conversation history
+          // The new user message is NOT in state yet, so we don't need to exclude it
           const conversationHistory = messages
             .filter(m => m.mode === 'family-chat')
             .map(m => ({
-              role: m.role === 'user' ? 'user' as const : 'model' as const,
-              parts: [{ text: m.content }]
+              role: m.role === 'user' ? 'family' as const : 'saroja' as const,
+              content: m.content
             }));
 
           response = await getGeminiResponse(currentFamily, userMessage, conversationHistory);
@@ -389,7 +492,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
       }
 
       // Add assistant response
-      setTimeout(() => {
+      setTimeout(async () => {
         const assistantMessage: Message = {
           role: 'assistant',
           content: response,
@@ -398,6 +501,18 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
         };
         setMessages(prev => [...prev, assistantMessage]);
         setIsProcessing(false);
+
+        // Speak the response if voice is enabled
+        if (voiceEnabled && voiceService.isSupported()) {
+          try {
+            setIsSpeaking(true);
+            await voiceService.speak(response, 'en-IN');
+            setIsSpeaking(false);
+          } catch (error) {
+            console.error('Voice output error:', error);
+            setIsSpeaking(false);
+          }
+        }
       }, 500);
 
     } catch (error) {
@@ -460,10 +575,11 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
         </Button>
       )}
 
-      {/* Chat Window - Enhanced iMessage Style */}
+      {/* Chat Window - Enhanced iMessage Style - FIXED LAYOUT */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-[420px] h-[600px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white rounded-[24px] p-0 gap-0">
-          <CardHeader className={`relative ${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 via-pink-600 to-rose-600' : 'bg-gradient-to-br from-orange-500 via-orange-600 to-red-600'} text-white p-4 backdrop-blur-xl`}>
+        <Card className="fixed bottom-6 right-6 w-[420px] h-[650px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white rounded-[24px] p-0 gap-0">
+          {/* Header - Fixed Height */}
+          <CardHeader className={`relative flex-shrink-0 ${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 via-pink-600 to-rose-600' : 'bg-gradient-to-br from-orange-500 via-orange-600 to-red-600'} text-white p-4 backdrop-blur-xl`}>
             {/* Glassmorphism overlay */}
             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
 
@@ -489,6 +605,25 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                 <Badge className="bg-white/20 backdrop-blur-sm text-white border-0 text-xs px-2.5 py-0.5 font-medium">
                   {chatMode === 'family-chat' ? 'Family' : 'Smart Home'}
                 </Badge>
+                {/* Voice Toggle Button */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const newState = !voiceEnabled;
+                    setVoiceEnabled(newState);
+                    voiceService.setVoiceEnabled(newState);
+                    if (!newState) {
+                      voiceService.stop();
+                      setIsSpeaking(false);
+                    }
+                    toast.success(newState ? "Voice enabled 🔊" : "Voice disabled 🔇");
+                  }}
+                  className={`h-8 w-8 p-0 hover:bg-white/20 text-white rounded-full transition-all duration-200 ${isSpeaking ? 'animate-pulse' : ''}`}
+                  title={voiceEnabled ? "Disable voice" : "Enable voice"}
+                >
+                  {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </Button>
                 {currentFamily && chatMode === 'family-chat' && (
                   <Button
                     size="sm"
@@ -512,10 +647,11 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100">
-            {/* Messages Area */}
-            <ScrollArea className="flex-1" ref={scrollRef}>
-              <div className="p-4 pb-6 space-y-4">
+          {/* Content Area - Flexible with proper overflow */}
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 min-h-0">
+            {/* Messages Area - Scrollable */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden" ref={scrollRef}>
+              <div className="p-4 space-y-4 min-h-full">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -587,11 +723,11 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
 
-            {/* Quick Reply Chips */}
+            {/* Quick Reply Chips - Fixed Height */}
             {messages.length <= 2 && !isProcessing && (
-              <div className="px-4 py-3 bg-white/80 backdrop-blur-sm border-t border-gray-200/50">
+              <div className="flex-shrink-0 px-4 py-3 bg-white/80 backdrop-blur-sm border-t border-gray-200/50">
                 <div className="flex flex-wrap gap-2">
                   {quickSuggestions.map((suggestion, index) => (
                     <button
@@ -611,8 +747,8 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
               </div>
             )}
 
-            {/* Input Area - Enhanced iMessage Style */}
-            <div className="p-4 bg-white/95 backdrop-blur-xl border-t border-gray-200/50">
+            {/* Input Area - Enhanced iMessage Style - Fixed Height */}
+            <div className="flex-shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-200/50">
               <div className="flex gap-2.5 items-center">
                 <Button
                   size="icon"
