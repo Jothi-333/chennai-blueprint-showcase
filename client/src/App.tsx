@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Budget from "./pages/Budget";
 import Gallery from "./pages/Gallery";
 import Progress from "./pages/Progress";
+import SmartHome from "./pages/SmartHome";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
         <Route path={"/budget"} component={Budget} />
         <Route path={"/gallery"} component={Gallery} />
         <Route path={"/progress"} component={Progress} />
+        <Route path={"/smart-home"} component={SmartHome} />
         <Route path={"/contact"} component={Contact} />
         <Route path={"/404"} component={NotFound} />
         {/* Final fallback route */}

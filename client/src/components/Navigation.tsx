@@ -11,6 +11,7 @@ const navItems = [
   { path: "/budget", label: "Budget & Costs" },
   { path: "/gallery", label: "Gallery" },
   { path: "/progress", label: "Project Progress" },
+  { path: "/smart-home", label: "Smart Home" },
   { path: "/contact", label: "Contact" },
 ];
 
