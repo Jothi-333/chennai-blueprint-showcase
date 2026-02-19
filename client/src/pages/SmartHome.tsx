@@ -32,6 +32,7 @@ import SarojaAIChat from "@/components/SarojaAIChat";
 import SecurityCameraGrid from "@/components/SecurityCameraGrid";
 import EnergyAnalyticsDashboard from "@/components/EnergyAnalyticsDashboard";
 import AutomationRulesManager from "@/components/AutomationRulesManager";
+import SarojaFamilyChat from "@/components/SarojaFamilyChat";
 import { toast } from "sonner";
 
 export default function SmartHome() {
@@ -659,6 +660,9 @@ export default function SmartHome() {
 
       {/* AI Chat Assistant */}
       <SarojaAIChat onDeviceControl={handleAICommand} />
+
+      {/* Family Chat */}
+      <SarojaFamilyChat />
     </div>
   );
 }
