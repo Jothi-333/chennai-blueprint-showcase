@@ -247,34 +247,41 @@ export default function SmartHome() {
         <div className="container">
           <Tabs value={selectedFloor} onValueChange={setSelectedFloor} className="space-y-6">
             {/* Floor Selector */}
-            <TabsList className="grid w-full grid-cols-7 max-w-5xl mx-auto">
-              <TabsTrigger value="ground" className="gap-2">
-                <Building2 className="h-4 w-4" />
-                Ground
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 max-w-5xl mx-auto h-auto p-2">
+              <TabsTrigger value="ground" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Ground</span>
+                <span className="sm:hidden">GF</span>
               </TabsTrigger>
-              <TabsTrigger value="floor1" className="gap-2">
-                <Layers className="h-4 w-4" />
-                Floor 1
+              <TabsTrigger value="floor1" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Floor 1</span>
+                <span className="sm:hidden">F1</span>
               </TabsTrigger>
-              <TabsTrigger value="floor2" className="gap-2">
-                <Layers className="h-4 w-4" />
-                Floor 2
+              <TabsTrigger value="floor2" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Floor 2</span>
+                <span className="sm:hidden">F2</span>
               </TabsTrigger>
-              <TabsTrigger value="terrace" className="gap-2">
-                <Sun className="h-4 w-4" />
-                Terrace
+              <TabsTrigger value="terrace" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Sun className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Terrace</span>
+                <span className="sm:hidden">TR</span>
               </TabsTrigger>
-              <TabsTrigger value="security" className="gap-2">
-                <Camera className="h-4 w-4" />
-                Security
+              <TabsTrigger value="security" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Security</span>
+                <span className="sm:hidden">SEC</span>
               </TabsTrigger>
-              <TabsTrigger value="energy" className="gap-2">
-                <Zap className="h-4 w-4" />
-                Energy
+              <TabsTrigger value="energy" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Energy</span>
+                <span className="sm:hidden">EN</span>
               </TabsTrigger>
-              <TabsTrigger value="automation" className="gap-2">
-                <Settings className="h-4 w-4" />
-                Automation
+              <TabsTrigger value="automation" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Automation</span>
+                <span className="sm:hidden">AUTO</span>
               </TabsTrigger>
             </TabsList>
 

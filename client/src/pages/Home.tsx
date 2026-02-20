@@ -17,12 +17,12 @@ import EditableFloorPlan from "@/components/EditableFloorPlan";
 import HybridFloorPlanEditor from "@/components/HybridFloorPlanEditor";
 import { firstFloorPlan } from "@/data/floorPlanData";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { 
-  Building2, 
-  Car, 
-  Home as HomeIcon, 
-  Layers, 
-  Ruler, 
+import {
+  Building2,
+  Car,
+  Home as HomeIcon,
+  Layers,
+  Ruler,
   ArrowUpRight,
   CheckCircle2,
   MapPin,
@@ -32,6 +32,8 @@ import {
   Edit3,
   Sparkles
 } from "lucide-react";
+
+
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -119,47 +121,56 @@ export default function Home() {
         <div className="container">
           <div className="max-w-5xl mx-auto">
             <Card className="border-primary/30 bg-card/50 overflow-hidden">
-              <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-                {/* Saroja's Photo */}
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl" />
-                  <div className="relative w-full max-w-[300px] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl bg-card">
-                    <img
-                      src="/images/Saroja.jpg"
-                      alt="Saroja Ammal"
-                      className="w-full h-auto object-cover"
-                      onError={(e) => {
-                        console.error('Image failed to load:', e);
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400"%3E%3Crect fill="%23333" width="300" height="400"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage Not Found%3C/text%3E%3C/svg%3E';
-                      }}
-                    />
+              <div className="p-8">
+                {/* Photo Section - Centered */}
+                <div className="flex justify-center mb-8">
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl"></div>
+                    <div className="relative w-[280px] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl bg-card">
+                      <img
+                        src="/images/Saroja.jpg"
+                        alt="Saroja Ammal"
+                        className="w-full h-auto block"
+                        onError={(e) => {
+                          console.error("❌ Image failed to load!");
+                          console.error("Current src:", e.currentTarget.src);
+                        }}
+                        onLoad={(e) => {
+                          console.log("✅ Image loaded successfully!");
+                          console.log("Loaded src:", e.currentTarget.src);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Memorial Text */}
-                <div className="flex flex-col justify-center">
-                  <div className="inline-block px-4 py-2 bg-primary/10 rounded mb-4 w-fit">
-                    <span className="text-sm font-mono text-primary font-semibold tracking-wide">IN LOVING MEMORY</span>
+                <div className="text-center">
+                  <div className="inline-block px-4 py-2 bg-primary/10 rounded mb-4">
+                    <span className="text-sm font-mono text-primary font-semibold tracking-wide">❤️ IN LOVING MEMORY</span>
                   </div>
 
                   <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
                     Saroja Illam
                   </h2>
 
-                  <p className="text-xl text-primary font-semibold mb-4">
-                    A Memorial Home for Saroja Ammal
+                  <p className="text-xl text-primary font-semibold mb-6">
+                    A Home Built with Love, Dedicated to <span className="text-primary">Saroja Ammal</span>
                   </p>
 
-                  <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                    This home is built in loving memory of <span className="text-foreground font-semibold">Saroja Ammal</span>,
-                    a beloved grandmother, mother, and the heart of our family. Though she has passed away and is now in heaven
-                    with her husband Govindaswami, her love, wisdom, and spirit live on through this memorial home in Porur, Chennai.
-                  </p>
+                  <div className="max-w-3xl mx-auto space-y-4 text-left">
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      This home is a heartfelt tribute to <span className="text-foreground font-semibold">Saroja Ammal</span>, the beloved grandmother of Mr. Gunasekaran and Mrs. Aswini, and the cherished mother of Maha Lakshmi.
+                    </p>
 
-                  <p className="text-base text-muted-foreground italic">
-                    "A grandmother's love is forever. Though she watches over us from heaven,
-                    her presence fills every corner of Saroja Illam." 💕
-                  </p>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Saroja Ammal was a pillar of strength, love, and wisdom in our family. Her warmth, kindness, and unwavering support touched the lives of everyone who knew her. She taught us the values of family, compassion, and resilience.
+                    </p>
+
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      Though she left us in <span className="text-foreground font-semibold">2020</span>, her spirit lives on in every corner of this home. Saroja Illam stands as a testament to her legacy—a place where family gathers, memories are made, and her love continues to guide us.
+                    </p>
+                  </div>
                 </div>
               </div>
             </Card>

@@ -91,37 +91,78 @@ class VoiceService {
       // Stop any ongoing speech
       this.stop();
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      // Clean text for better speech (remove emojis and special chars)
+      const cleanText = text.replace(/[🙏💕❤️✨🏠👋😊😄🎉]/g, '').trim();
+      if (!cleanText) {
+        resolve();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = language;
       utterance.rate = SAROJA_VOICE_SETTINGS.rate;
       utterance.pitch = SAROJA_VOICE_SETTINGS.pitch;
       utterance.volume = SAROJA_VOICE_SETTINGS.volume;
 
-      // Select best voice
-      const voice = this.selectBestVoice(language);
-      if (voice) {
-        utterance.voice = voice;
+      // Select best voice - wait for voices to load
+      const loadVoicesAndSpeak = () => {
+        const voice = this.selectBestVoice(language);
+        if (voice) {
+          utterance.voice = voice;
+        }
+
+        utterance.onstart = () => {
+          this.isSpeaking = true;
+        };
+
+        utterance.onend = () => {
+          this.isSpeaking = false;
+          this.currentUtterance = null;
+          resolve();
+        };
+
+        utterance.onerror = (event) => {
+          this.isSpeaking = false;
+          this.currentUtterance = null;
+          console.error('Speech synthesis error:', event);
+
+          // Don't reject on "interrupted" or "canceled" errors
+          if (event.error === 'interrupted' || event.error === 'canceled') {
+            resolve();
+          } else {
+            reject(event);
+          }
+        };
+
+        this.currentUtterance = utterance;
+
+        try {
+          this.synthesis!.speak(utterance);
+        } catch (error) {
+          console.error('Failed to speak:', error);
+          this.isSpeaking = false;
+          this.currentUtterance = null;
+          reject(error);
+        }
+      };
+
+      // Check if voices are loaded
+      const voices = this.synthesis.getVoices();
+      if (voices.length === 0) {
+        // Wait for voices to load
+        this.synthesis.onvoiceschanged = () => {
+          loadVoicesAndSpeak();
+        };
+
+        // Timeout after 2 seconds
+        setTimeout(() => {
+          if (!this.isSpeaking) {
+            loadVoicesAndSpeak();
+          }
+        }, 2000);
+      } else {
+        loadVoicesAndSpeak();
       }
-
-      utterance.onstart = () => {
-        this.isSpeaking = true;
-      };
-
-      utterance.onend = () => {
-        this.isSpeaking = false;
-        this.currentUtterance = null;
-        resolve();
-      };
-
-      utterance.onerror = (event) => {
-        this.isSpeaking = false;
-        this.currentUtterance = null;
-        console.error('Speech synthesis error:', event);
-        reject(event);
-      };
-
-      this.currentUtterance = utterance;
-      this.synthesis.speak(utterance);
     });
   }
 

@@ -78,7 +78,7 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentFamily, setCurrentFamily] = useState<string | null>(null);
   const [conversationStage, setConversationStage] = useState<'greeting' | 'identified' | 'conversation'>('greeting');
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceEnabled, setVoiceEnabled] = useState(false); // Start disabled - user must enable
   const [isSpeaking, setIsSpeaking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -107,6 +107,20 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
     'paati', 'grandmother', 'amma', 'family', 'i am', 'this is',
     'my name', 'hello', 'hi', 'namaste', 'vanakkam', 'who are you', 'tell me about'
   ];
+
+  // Initialize voice service on mount
+  useEffect(() => {
+    // Load voices when component mounts
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // Some browsers need this to load voices
+      window.speechSynthesis.getVoices();
+
+      // Listen for voices changed event
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
 
   // Auto-scroll to bottom - Fixed for native div scrolling
   useEffect(() => {
@@ -562,22 +576,22 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
         <Button
           onClick={() => setIsOpen(true)}
           size="lg"
-          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl border-4 border-white/30 bg-gradient-to-br from-pink-600 via-pink-500 to-rose-600 hover:from-pink-700 hover:via-pink-600 hover:to-rose-700 z-50 group animate-pulse hover:animate-none"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl border-4 border-white/30 bg-gradient-to-br from-pink-600 via-pink-500 to-rose-600 hover:from-pink-700 hover:via-pink-600 hover:to-rose-700 z-50 group animate-pulse hover:animate-none"
         >
           <div className="relative">
             {chatMode === 'family-chat' ? (
-              <Heart className="h-8 w-8 fill-current text-white" />
+              <Heart className="h-7 w-7 md:h-8 md:w-8 fill-current text-white" />
             ) : (
-              <Bot className="h-8 w-8 text-white" />
+              <Bot className="h-7 w-7 md:h-8 md:w-8 text-white" />
             )}
-            <Sparkles className="h-5 w-5 absolute -top-1 -right-1 text-yellow-300 animate-spin" />
+            <Sparkles className="h-4 w-4 md:h-5 md:w-5 absolute -top-1 -right-1 text-yellow-300 animate-spin" />
           </div>
         </Button>
       )}
 
       {/* Chat Window - Enhanced iMessage Style - FIXED LAYOUT */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-[420px] h-[650px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white rounded-[24px] p-0 gap-0">
+        <Card className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[420px] h-[100dvh] md:h-[650px] shadow-2xl z-50 flex flex-col border-0 overflow-hidden bg-white md:rounded-[24px] p-0 gap-0">
           {/* Header - Fixed Height */}
           <CardHeader className={`relative flex-shrink-0 ${chatMode === 'family-chat' ? 'bg-gradient-to-br from-pink-500 via-pink-600 to-rose-600' : 'bg-gradient-to-br from-orange-500 via-orange-600 to-red-600'} text-white p-4 backdrop-blur-xl`}>
             {/* Glassmorphism overlay */}
@@ -609,15 +623,39 @@ export default function UnifiedSarojaChat({ onDeviceControl }: UnifiedSarojaChat
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {
+                  onClick={async () => {
                     const newState = !voiceEnabled;
-                    setVoiceEnabled(newState);
-                    voiceService.setVoiceEnabled(newState);
-                    if (!newState) {
+
+                    if (newState) {
+                      // Enabling voice - check if supported
+                      if (!voiceService.isSupported()) {
+                        toast.error("Voice not supported in this browser 😔");
+                        return;
+                      }
+
+                      // Test voice with a short greeting
+                      try {
+                        setVoiceEnabled(true);
+                        voiceService.setVoiceEnabled(true);
+                        setIsSpeaking(true);
+                        await voiceService.speak("Voice enabled, kanna!", 'en-IN');
+                        setIsSpeaking(false);
+                        toast.success("Voice enabled 🔊");
+                      } catch (error) {
+                        console.error('Voice test failed:', error);
+                        setVoiceEnabled(false);
+                        voiceService.setVoiceEnabled(false);
+                        setIsSpeaking(false);
+                        toast.error("Voice failed to start. Try again! 😔");
+                      }
+                    } else {
+                      // Disabling voice
+                      setVoiceEnabled(false);
+                      voiceService.setVoiceEnabled(false);
                       voiceService.stop();
                       setIsSpeaking(false);
+                      toast.success("Voice disabled 🔇");
                     }
-                    toast.success(newState ? "Voice enabled 🔊" : "Voice disabled 🔇");
                   }}
                   className={`h-8 w-8 p-0 hover:bg-white/20 text-white rounded-full transition-all duration-200 ${isSpeaking ? 'animate-pulse' : ''}`}
                   title={voiceEnabled ? "Disable voice" : "Enable voice"}

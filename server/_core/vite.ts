@@ -20,7 +20,13 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
+  // Serve static files from public directory
+  const publicDir = path.resolve(import.meta.dirname, "../..", "client", "public");
+  app.use(express.static(publicDir));
+
   app.use(vite.middlewares);
+
+  // Serve HTML for all other routes (SPA fallback)
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
