@@ -52,6 +52,20 @@ const DEVICE_TYPES = [
   { value: 'other', label: 'Other', icon: Circle, color: 'gray' }
 ];
 
+// Helper function to format schedule time display
+const formatTime = (schedule: Schedule) => {
+  if (schedule.type === 'sunrise') {
+    return `Sunrise ${schedule.offset ? (schedule.offset > 0 ? `+${schedule.offset}m` : `${schedule.offset}m`) : ''}`;
+  }
+  if (schedule.type === 'sunset') {
+    return `Sunset ${schedule.offset ? (schedule.offset > 0 ? `+${schedule.offset}m` : `${schedule.offset}m`) : ''}`;
+  }
+  if (schedule.type === 'countdown') {
+    return `${schedule.countdown} minutes`;
+  }
+  return schedule.time;
+};
+
 export default function DeviceScheduler() {
   const [isCreating, setIsCreating] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
@@ -138,19 +152,6 @@ export default function DeviceScheduler() {
   const getDeviceColor = (type: Schedule['deviceType']) => {
     const deviceType = DEVICE_TYPES.find(d => d.value === type);
     return deviceType?.color || 'gray';
-  };
-
-  const formatTime = (schedule: Schedule) => {
-    if (schedule.type === 'sunrise') {
-      return `Sunrise ${schedule.offset ? (schedule.offset > 0 ? `+${schedule.offset}m` : `${schedule.offset}m`) : ''}`;
-    }
-    if (schedule.type === 'sunset') {
-      return `Sunset ${schedule.offset ? (schedule.offset > 0 ? `+${schedule.offset}m` : `${schedule.offset}m`) : ''}`;
-    }
-    if (schedule.type === 'countdown') {
-      return `${schedule.countdown} minutes`;
-    }
-    return schedule.time;
   };
 
   const groupedSchedules = schedules.reduce((acc, schedule) => {
