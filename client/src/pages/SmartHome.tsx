@@ -25,13 +25,23 @@ import {
   CheckCircle2,
   Building2,
   Layers,
-  CloudRain
+  CloudRain,
+  Sparkles,
+  Clock,
+  History,
+  Bell,
+  GitBranch
 } from "lucide-react";
 import { useState } from "react";
 import UnifiedSarojaChat from "@/components/UnifiedSarojaChat";
 import SecurityCameraGrid from "@/components/SecurityCameraGrid";
 import EnergyAnalyticsDashboard from "@/components/EnergyAnalyticsDashboard";
 import AutomationRulesManager from "@/components/AutomationRulesManager";
+import SmartScenes from "@/components/SmartScenes";
+import DeviceScheduler from "@/components/DeviceScheduler";
+import ActivityLog from "@/components/ActivityLog";
+import NotificationCenter from "@/components/NotificationCenter";
+import AdvancedAutomationRules from "@/components/AdvancedAutomationRules";
 import { toast } from "sonner";
 
 export default function SmartHome() {
@@ -247,7 +257,7 @@ export default function SmartHome() {
         <div className="container">
           <Tabs value={selectedFloor} onValueChange={setSelectedFloor} className="space-y-6">
             {/* Floor Selector */}
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 max-w-5xl mx-auto h-auto p-2">
+            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 max-w-7xl mx-auto h-auto p-2">
               <TabsTrigger value="ground" className="gap-1 sm:gap-2 text-xs sm:text-sm">
                 <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Ground</span>
@@ -282,6 +292,31 @@ export default function SmartHome() {
                 <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Automation</span>
                 <span className="sm:hidden">AUTO</span>
+              </TabsTrigger>
+              <TabsTrigger value="scenes" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Scenes</span>
+                <span className="sm:hidden">SCN</span>
+              </TabsTrigger>
+              <TabsTrigger value="schedule" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Schedule</span>
+                <span className="sm:hidden">SCH</span>
+              </TabsTrigger>
+              <TabsTrigger value="activity" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <History className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Activity</span>
+                <span className="sm:hidden">LOG</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Alerts</span>
+                <span className="sm:hidden">🔔</span>
+              </TabsTrigger>
+              <TabsTrigger value="rules" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <GitBranch className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Rules</span>
+                <span className="sm:hidden">RUL</span>
               </TabsTrigger>
             </TabsList>
 
@@ -659,6 +694,31 @@ export default function SmartHome() {
             {/* Automation Tab */}
             <TabsContent value="automation" className="space-y-6">
               <AutomationRulesManager />
+            </TabsContent>
+
+            {/* Smart Scenes Tab */}
+            <TabsContent value="scenes" className="space-y-6">
+              <SmartScenes />
+            </TabsContent>
+
+            {/* Device Scheduler Tab */}
+            <TabsContent value="schedule" className="space-y-6">
+              <DeviceScheduler />
+            </TabsContent>
+
+            {/* Activity Log Tab */}
+            <TabsContent value="activity" className="space-y-6">
+              <ActivityLog />
+            </TabsContent>
+
+            {/* Notifications Tab */}
+            <TabsContent value="notifications" className="space-y-6">
+              <NotificationCenter />
+            </TabsContent>
+
+            {/* Advanced Automation Rules Tab */}
+            <TabsContent value="rules" className="space-y-6">
+              <AdvancedAutomationRules />
             </TabsContent>
           </Tabs>
         </div>

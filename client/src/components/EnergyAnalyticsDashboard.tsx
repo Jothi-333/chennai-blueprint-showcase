@@ -1,27 +1,31 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  BarChart, 
-  Bar, 
-  LineChart, 
-  Line, 
-  PieChart, 
-  Pie, 
+import { Progress } from "@/components/ui/progress";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from "recharts";
-import { 
-  Zap, 
-  TrendingDown, 
-  TrendingUp, 
-  Sun, 
+import {
+  Zap,
+  TrendingDown,
+  TrendingUp,
+  Sun,
   Battery,
   Home,
   DollarSign,
@@ -31,7 +35,16 @@ import {
   Wind,
   Tv,
   Droplet,
-  Activity
+  Activity,
+  AlertCircle,
+  CheckCircle2,
+  Target,
+  Leaf,
+  Download,
+  Settings,
+  Info,
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 
 export default function EnergyAnalyticsDashboard() {
@@ -101,8 +114,84 @@ export default function EnergyAnalyticsDashboard() {
 
   const formatCurrency = (value: number) => `₹${value}`;
 
+  // Energy-saving recommendations
+  const recommendations = [
+    {
+      id: '1',
+      title: 'AC Running Too Long',
+      description: 'Bedroom AC has been running for 8 hours. Consider setting a timer.',
+      impact: 'Save ₹45/day',
+      priority: 'high',
+      icon: Wind
+    },
+    {
+      id: '2',
+      title: 'Peak Hour Usage',
+      description: 'High consumption during peak hours (6-10 PM). Shift usage to off-peak.',
+      impact: 'Save ₹120/month',
+      priority: 'medium',
+      icon: Clock
+    },
+    {
+      id: '3',
+      title: 'Lights Left On',
+      description: '3 lights have been on for over 4 hours with no motion detected.',
+      impact: 'Save ₹15/day',
+      priority: 'medium',
+      icon: Lightbulb
+    },
+    {
+      id: '4',
+      title: 'Solar Optimization',
+      description: 'Run heavy appliances between 10 AM - 2 PM for maximum solar usage.',
+      impact: 'Save ₹200/month',
+      priority: 'low',
+      icon: Sun
+    }
+  ];
+
+  // Real-time device monitoring
+  const liveDevices = [
+    { name: 'Living Room AC', power: 1.5, status: 'on', cost: 12, icon: Wind, color: 'blue' },
+    { name: 'Water Heater', power: 2.0, status: 'on', cost: 16, icon: Droplet, color: 'orange' },
+    { name: 'Kitchen Lights', power: 0.05, status: 'on', cost: 0.4, icon: Lightbulb, color: 'yellow' },
+    { name: 'TV', power: 0.15, status: 'on', cost: 1.2, icon: Tv, color: 'purple' }
+  ];
+
+  // Monthly budget tracking
+  const monthlyBudget = {
+    limit: 2000,
+    current: 1456,
+    projected: 1890,
+    daysLeft: 12
+  };
+
+  const budgetPercentage = (monthlyBudget.current / monthlyBudget.limit) * 100;
+  const projectedPercentage = (monthlyBudget.projected / monthlyBudget.limit) * 100;
+
   return (
     <div className="space-y-6">
+      {/* Header with Actions */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+            Energy Analytics
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Monitor consumption, track costs, and optimize energy usage
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Export Report
+          </Button>
+          <Button variant="outline" size="icon">
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Consumption */}
@@ -294,6 +383,222 @@ export default function EnergyAnalyticsDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Real-Time Monitoring & Budget Tracking */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Live Device Monitoring */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-green-500" />
+              Live Monitoring
+              <Badge className="ml-2 bg-green-500 animate-pulse">
+                Real-time
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {liveDevices.map((device, index) => {
+                const Icon = device.icon;
+                return (
+                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+                    <div className={`p-2 rounded-lg bg-${device.color}-100 dark:bg-${device.color}-900/30`}>
+                      <Icon className={`h-5 w-5 text-${device.color}-600 dark:text-${device.color}-400`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-sm">{device.name}</h4>
+                        <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-950/20 border-green-300">
+                          Active
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Zap className="h-3 w-3" />
+                          {device.power} kW
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          ₹{device.cost}/hr
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="pt-3 border-t">
+                <div className="flex items-center justify-between text-sm font-semibold">
+                  <span>Total Power Draw</span>
+                  <span className="text-green-600 dark:text-green-400">
+                    {liveDevices.reduce((sum, d) => sum + d.power, 0).toFixed(2)} kW
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground mt-1">
+                  <span>Current Cost Rate</span>
+                  <span>₹{liveDevices.reduce((sum, d) => sum + d.cost, 0).toFixed(2)}/hr</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Monthly Budget Tracker */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-blue-500" />
+              Monthly Budget
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Current Spending</span>
+                <span className="font-semibold">₹{monthlyBudget.current} / ₹{monthlyBudget.limit}</span>
+              </div>
+              <Progress value={budgetPercentage} className="h-3" />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{budgetPercentage.toFixed(0)}% used</span>
+                <span>{monthlyBudget.daysLeft} days left</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Projected Spending</span>
+                <span className={`font-semibold ${projectedPercentage > 100 ? 'text-red-500' : 'text-green-500'}`}>
+                  ₹{monthlyBudget.projected}
+                </span>
+              </div>
+              <Progress
+                value={projectedPercentage}
+                className={`h-2 ${projectedPercentage > 100 ? 'bg-red-100 dark:bg-red-900/20' : ''}`}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-3 border-t">
+              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-xs font-semibold text-green-600 dark:text-green-400">On Track</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  You're within budget
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-2 mb-1">
+                  <Leaf className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Eco Mode</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  15.4 kg CO₂ saved
+                </p>
+              </div>
+            </div>
+
+            <Button className="w-full gap-2 bg-gradient-to-r from-blue-600 to-cyan-600">
+              <Settings className="h-4 w-4" />
+              Adjust Budget
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Energy-Saving Recommendations */}
+      <Card className="border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50/50 to-yellow-50/50 dark:from-amber-950/20 dark:to-yellow-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            Energy-Saving Recommendations
+            <Badge className="ml-2 bg-amber-500">
+              Save up to ₹380/month
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {recommendations.map((rec) => {
+              const Icon = rec.icon;
+              const priorityColors = {
+                high: 'border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20',
+                medium: 'border-yellow-300 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-950/20',
+                low: 'border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20'
+              };
+
+              return (
+                <div
+                  key={rec.id}
+                  className={`p-4 rounded-lg border-2 ${priorityColors[rec.priority]} hover:shadow-md transition-shadow`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+                      <Icon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-1">
+                        <h4 className="font-semibold text-sm">{rec.title}</h4>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${
+                            rec.priority === 'high'
+                              ? 'border-red-400 text-red-600'
+                              : rec.priority === 'medium'
+                              ? 'border-yellow-400 text-yellow-600'
+                              : 'border-blue-400 text-blue-600'
+                          }`}
+                        >
+                          {rec.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {rec.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-green-600 dark:text-green-400">
+                          {rec.impact}
+                        </span>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs gap-1">
+                          Apply
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Peak Usage Alert */}
+      <Card className="border-2 border-orange-200 dark:border-orange-800">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
+              <AlertCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-1">Peak Hour Alert</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                You're currently using 3.7 kW during peak hours (6-10 PM). Electricity costs are 40% higher during this time.
+              </p>
+              <div className="flex items-center gap-3">
+                <Button size="sm" className="gap-2">
+                  <Info className="h-4 w-4" />
+                  View Peak Hours
+                </Button>
+                <Button size="sm" variant="outline" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Set Reminders
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
