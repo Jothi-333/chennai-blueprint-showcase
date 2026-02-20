@@ -20,15 +20,21 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  // Serve static files from public directory
+  // Serve static files from public directory FIRST
   const publicDir = path.resolve(import.meta.dirname, "../..", "client", "public");
   app.use(express.static(publicDir));
 
   app.use(vite.middlewares);
 
   // Serve HTML for all other routes (SPA fallback)
+  // Skip this for static file requests (images, fonts, etc.)
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+
+    // Skip SPA fallback for static files
+    if (url.match(/\.(jpg|jpeg|png|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/i)) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(

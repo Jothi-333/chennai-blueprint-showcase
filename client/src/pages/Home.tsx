@@ -129,11 +129,19 @@ export default function Home() {
                     <div className="relative w-[280px] rounded-lg overflow-hidden border-4 border-primary/30 shadow-2xl bg-card">
                       <img
                         src="/images/Saroja.jpg"
-                        alt="Saroja Ammal"
-                        className="w-full h-auto block"
+                        alt="Saroja Ammal - Beloved Grandmother"
+                        className="w-full h-auto block object-cover"
+                        style={{ minHeight: '350px' }}
                         onError={(e) => {
                           console.error("❌ Image failed to load!");
                           console.error("Current src:", e.currentTarget.src);
+                          console.error("Full URL:", window.location.origin + "/images/Saroja.jpg");
+                          // Try alternative path
+                          const target = e.currentTarget;
+                          if (!target.dataset.retried) {
+                            target.dataset.retried = "true";
+                            target.src = window.location.origin + "/images/Saroja.jpg";
+                          }
                         }}
                         onLoad={(e) => {
                           console.log("✅ Image loaded successfully!");
